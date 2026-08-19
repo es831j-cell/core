@@ -1,0 +1,69 @@
+plugins {
+    id 'com.android.application'
+    id 'org.jetbrains.kotlin.android'
+}
+
+def keystoreProperties = new Properties()
+def keystorePropertiesFile = file('keystore.properties')
+if (keystorePropertiesFile.exists()) {
+    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+}
+
+android {
+    namespace 'com.distressedelk.lumi'
+    compileSdk 35
+
+    defaultConfig {
+        applicationId 'com.distressedelk.lumi'
+        minSdk 28
+        targetSdk 35
+        versionCode 220
+        versionName '2.0'
+        ndk { abiFilters 'arm64-v8a' }
+    }
+
+    signingConfigs {
+        lumiPrototype {
+            storeFile file(keystoreProperties['storeFile'])
+            storePassword keystoreProperties['storePassword']
+            keyAlias keystoreProperties['keyAlias']
+            keyPassword keystoreProperties['keyPassword']
+        }
+    }
+
+    buildTypes {
+        debug { signingConfig signingConfigs.lumiPrototype }
+        release {
+            signingConfig signingConfigs.lumiPrototype
+            minifyEnabled false
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+    kotlinOptions { jvmTarget = '17' }
+
+    // llama-android ships arm64 native libraries. Keep JNI packaging deterministic
+    // in APK Factory/GitHub Actions and avoid legacy extraction differences.
+    packaging {
+        jniLibs {
+            useLegacyPackaging = false
+        }
+        resources {
+            excludes += ['/META-INF/{AL2.0,LGPL2.1}']
+        }
+    }
+}
+
+
+dependencies {
+    // Explicit versions mirror llama-android's published metadata. Keeping them
+    // explicit makes APK Factory dependency resolution reproducible.
+    implementation 'org.jetbrains.kotlin:kotlin-stdlib:2.0.21'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.9.0'
+    implementation 'androidx.core:core-ktx:1.13.1'
+    implementation 'dev.ffmpegkit-maintained:llama-android:0.1.1'
+}
+

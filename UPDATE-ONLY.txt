@@ -1,0 +1,6 @@
+LUMI 2.0 CONVERSATION CORE DEV UPDATE
+
+INSTALL OVER the existing Lumi application.
+Do not uninstall the current app first if you want to preserve its downloaded model and app data.
+
+This update is focused on conversation stability, diagnostics, invisible offline fallback, conversational self-tuning, and the temporary Möbius development avatar.
