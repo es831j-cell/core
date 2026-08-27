@@ -1,0 +1,19 @@
+# Lumi canonical source: signing material is never committed.
+app/keystore.properties
+app/*.jks
+*.jks
+*.keystore
+*.p12
+*.pem
+*.key
+
+# Android/Gradle generated state
+.gradle/
+**/build/
+local.properties
+.idea/
+*.iml
+
+# OS/editor clutter
+.DS_Store
+Thumbs.db

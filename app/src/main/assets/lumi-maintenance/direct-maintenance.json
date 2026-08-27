@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 2,
+  "feature": "direct-maintenance-host",
+  "enabled": true,
+  "mode": "same-phone-tools-with-private-build-relay",
+  "phoneBehavior": {
+    "wakeScreen": false,
+    "playSound": false,
+    "vibrate": false,
+    "speak": false,
+    "deferAndroidApprovalUntilDeviceAvailable": true
+  },
+  "authorization": {
+    "defaultDeny": true,
+    "allowRemoteShell": false,
+    "allowArbitraryFileAccess": false,
+    "interimWriteGate": "admin enrollment + unlocked device + explicit approval"
+  },
+  "selfUpdate": {
+    "engine": "lumi-native-self-update-r105",
+    "companionAppRequired": false,
+    "checkpointBeforeExecutableUpdate": true,
+    "verifyPackageSignatureAndVersion": true,
+    "androidInstallerIsApprovalBoundary": true,
+    "postInstallValidation": true
+  },
+  "reporting": {
+    "alwaysReturnTerminalResult": true,
+    "successRequiresPostUpdatePass": true,
+    "failureRequiresStageAndDiagnostic": true,
+    "persistToTechnicalLedger": true
+  },
+  "nativeHost": {"required": true, "capability": "directMaintenanceHostV1"}
+}

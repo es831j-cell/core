@@ -1,0 +1,51 @@
+LUMI CODE387 / R104 FACTORY BOOTSTRAP REPAIR - BUILD AUDIT
+Generated: 2026-08-26
+
+TARGET
+PASS  Lumi versionCode = 387
+PASS  Lumi versionName = 4.4.7-factory-bootstrap-repair-r104
+PASS  Guardian versionCode = 18
+PASS  Guardian versionName = 2.7-installer-recovery-r81
+
+SIGNING / UPDATE IDENTITY
+PASS  Existing Lumi signing files carried forward for APK Factory compilation.
+PASS  Signing certificate SHA-256 matches trusted installed Lumi identity:
+      0AD00784E2D593A469CB445D2CC1AFE94E31663768F96470A38144E84EFE8AD2
+PASS  Signing secrets are not copied into the source patch/audit text.
+
+BRIDGE BOOTSTRAP REPAIR
+PASS  Guardian checks canRequestPackageInstalls() before requesting install-source Settings.
+PASS  STATUS_PENDING_USER_ACTION confirmation is retained behind InstallApprovalStore.
+PASS  Guardian foreground automatically presents the retained Android confirmation.
+PASS  Lumi zero-chat coordinator asks Guardian to resume/recover pending installs.
+PASS  Durable relay poller asks Guardian to recover pending/stale PackageInstaller state.
+PASS  Missing stale PackageInstaller sessions can be resubmitted from the retained APK.
+PASS  Retained APK is SHA-256 checked and Lumi signature/version verified before resubmission.
+PASS  Guardian boot/package-replacement receiver re-enters install recovery.
+PASS  Successful install clears retained candidate and proceeds to post-install certification.
+
+VISUAL BASELINE
+PASS  Approved inverted pyramid remains the default visual.
+PASS  Listening = deep forest green.
+PASS  Thinking = crimson.
+PASS  Speaking = violet.
+PASS  Color transition = 6000 ms.
+PASS  Bounded X/Y idle motion retained.
+
+PRIVATE MODE REMOVAL
+PASS  Private Mode UI/visual classes and private visual image assets are absent.
+PASS  Legacy Private Mode purge migration remains so old installed state is removed.
+PASS  Generic encrypted PrivateStore remains because it protects normal Lumi memory/secrets; it is not the removed Private Mode feature.
+
+ACCEPTANCE
+PASS  Clean spoken-reply gate = 5 consecutive replies.
+PASS  Identity, barge-in, maintenance, latency and safety gates remain independent.
+
+PACKAGE HYGIENE
+PASS  Source manifest generated: 156 files.
+PASS  SHA-256 file manifest generated.
+PASS  R104 patch generated and secret-scanned.
+PASS  No build output folders included.
+
+NOTE
+This artifact is APK-Factory-ready Android source. The actual Android compile/sign step occurs in APK Factory; this environment does not contain an Android SDK, so no local APK compilation is claimed by this audit.

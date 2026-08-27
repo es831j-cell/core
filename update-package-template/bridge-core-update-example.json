@@ -1,0 +1,26 @@
+{
+  "formatVersion": 1,
+  "updateId": "example-bridge-core-383",
+  "name": "Lumi Code383 Update",
+  "version": "4.4.3-example",
+  "type": "bridge-core",
+  "minAppVersionCode": 382,
+  "maxAppVersionCode": 382,
+  "releaseNotes": "Example source-first update for the Code382 reinforced bridge.",
+  "sourceRecord": {
+    "formatVersion": 1,
+    "baseVersionCode": 382,
+    "targetVersionCode": 383,
+    "targetVersionName": "4.4.3-example",
+    "baseSourceSha256": "<64 hex current canonical source archive hash>",
+    "targetSourceSha256": "<64 hex next canonical source archive hash>",
+    "sourceArchivePath": "payload/canonical-source.zip",
+    "changeRecordPath": "payload/source-change-record.json",
+    "patchPath": "payload/source.patch"
+  },
+  "files": [
+    {"path":"payload/canonical-source.zip","sha256":"<same as targetSourceSha256>"},
+    {"path":"payload/source-change-record.json","sha256":"<sha256>"},
+    {"path":"payload/source.patch","sha256":"<sha256>"}
+  ]
+}

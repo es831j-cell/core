@@ -1,0 +1,29 @@
+{
+  "formatVersion": 1,
+  "updateId": "example-core-326",
+  "name": "Lumi Core Update",
+  "version": "326",
+  "type": "core",
+  "minAppVersionCode": 325,
+  "maxAppVersionCode": 325,
+  "releaseNotes": "Example Code325+ core update with source-of-truth preservation.",
+  "apk": {
+    "path": "payload/lumi-core.apk"
+  },
+  "sourceRecord": {
+    "formatVersion": 1,
+    "baseVersionCode": 325,
+    "targetVersionCode": 326,
+    "baseSourceSha256": "<64 hex current canonical source hash>",
+    "targetSourceSha256": "<64 hex target canonical source hash>",
+    "sourceArchivePath": "payload/canonical-source.zip",
+    "changeRecordPath": "payload/source-change-record.json",
+    "patchPath": "payload/source.patch"
+  },
+  "files": [
+    {"path":"payload/lumi-core.apk","sha256":"<sha256>"},
+    {"path":"payload/canonical-source.zip","sha256":"<same as targetSourceSha256>"},
+    {"path":"payload/source-change-record.json","sha256":"<sha256>"},
+    {"path":"payload/source.patch","sha256":"<sha256>"}
+  ]
+}

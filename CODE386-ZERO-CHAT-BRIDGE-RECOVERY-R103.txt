@@ -1,0 +1,20 @@
+LUMI CODE386 • ZERO-CHAT BRIDGE RECOVERY • R103
+
+PURPOSE
+Repair the durable bridge bind failure exposed when a verified newer bridge-core update is started while an older local transaction record is still active. Preserve the R102 zero-chat update flow, approved state-color inverted pyramid, and permanent Private Mode removal.
+
+R103 BRIDGE RULES
+1. Reconcile the existing local durable transaction against Guardian before creating a new request.
+2. If Guardian still owns a live build/install/certification, resume that exact transaction instead of overwriting it.
+3. If Guardian no longer owns the local transaction and no install/certification is live, retire the stale local record and allow the newer verified bridge package to start.
+4. After Guardian accepts a new request, bind by Guardian-confirmed request identity. A stale local preference record may not strand a Guardian-accepted request.
+5. Keep the relay worker alive through build, Android install approval, package replacement, and Guardian certification. ChatGPT/chat is never an operational update dependency.
+
+VISUAL / PRIVACY
+- Approved inverted pyramid remains the default Lumi visual.
+- Listening: deep forest green. Thinking: crimson. Speaking: violet.
+- State transitions remain 6000 ms; idle motion remains bounded X/Y with no flat Z spin.
+- Private Mode code/assets/runtime state remain removed; generic encrypted storage used by Lumi security/memory is retained.
+
+SECURITY
+R103 does not bypass Android PackageInstaller confirmation, Guardian signature/version/source verification, checkpoints, rollback, or administrator authorization. Ambiguous live transactions fail safe and are resumed rather than silently discarded.

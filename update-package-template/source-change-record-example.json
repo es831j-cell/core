@@ -1,0 +1,12 @@
+{
+  "format": "LumiSourceChangeRecord",
+  "formatVersion": 1,
+  "updateId": "example-core-389",
+  "baseVersionCode": 388,
+  "targetVersionCode": 389,
+  "baseSourceSha256": "<64 hex current canonical source hash>",
+  "targetSourceSha256": "<64 hex target canonical source hash>",
+  "reason": "Describe the evidence and purpose for this core improvement.",
+  "filesChanged": ["app/src/main/java/com/distressedelk/lumi/Example.java"],
+  "tests": ["static source audit", "private trusted compile/sign", "Lumi native post-install validation", "fresh Black Box device acceptance"]
+}

@@ -1,0 +1,32 @@
+LUMI CODE385 • ZERO-CHAT UPDATE + PYRAMID DEFAULT • R102
+
+Purpose
+- Finish the trusted relay handoff so the durable worker continues after Guardian install submission.
+- Remove ChatGPT/chat as an operational dependency for installing an already approved trusted update.
+- Automatically present retained Android install approval from Lumi when Android requires user action.
+- Make the approved inverted pyramid the mandatory default Lumi visual with state-driven color transitions.
+- Remove Private Mode user flows, private visual assets, generated render artifacts, configuration, and private-scoped memory data.
+
+Visual contract
+- Listening: deep forest green
+- Thinking: crimson
+- Speaking: violet/purple
+- Transition: 6000 ms
+- Idle: bounded X/Y rotation, no flat Z spin
+- Wireframe: diagnostics only
+
+Update contract
+- Trusted source -> GitHub Actions signed APK -> Guardian verify/checkpoint/install -> Android system approval when required -> Guardian certification.
+- The relay worker remains active through Guardian submission, Android approval, package replacement, and certification.
+- No ChatGPT/chat step is required after the trusted transaction has been initiated.
+- Android OS security confirmation is not bypassed; Lumi presents it on-device when required.
+
+Private Mode removal
+- Private visual resources removed from packaged source.
+- Private visual studio/render bridge source removed.
+- Private Mode UI/voice activation removed.
+- Startup migration purges private-mode preferences, generated render-bridge data, private avatar update file, and private-scoped memory events.
+- Keystore-backed secure secret storage remains; it is a security mechanism, not Private Mode.
+
+Acceptance adjustment
+- Clean spoken-reply proof window reduced from 20 to 5 consecutive clean replies; safety/identity/barge-in/maintenance/latency gates remain independent.

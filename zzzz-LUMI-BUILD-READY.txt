@@ -1,0 +1,12 @@
+LUMI CODE388 R105 • PRIVATE APK FACTORY BUILD READY
+
+Target: com.distressedelk.lumi
+Version code: 388
+Version name: 4.4.8-native-self-update-r105
+
+This is the one-time consolidated Factory bootstrap that removes Guardian from the operational update path and installs Lumi's native self-update engine plus the workstation Home / approved layered pyramid / current remediation changes.
+
+BUILD WITH PRIVATE APK FACTORY ONLY.
+Install the resulting APK OVER the currently installed Lumi.
+DO NOT uninstall Lumi first.
+After install, open Lumi, allow Android install-source permission if requested for future self-updates, exercise voice/barge-in once, then Export Black Box from Home.

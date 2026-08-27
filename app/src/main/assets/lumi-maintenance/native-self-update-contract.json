@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "feature": "lumi-native-self-update-r105",
+  "owner": "lumi",
+  "companionAppRequired": false,
+  "androidInstallerApprovalRequired": true,
+  "requirements": {
+    "samePackageName": true,
+    "sameSigningCertificate": true,
+    "forwardVersionOnly": true,
+    "sha256Verification": true,
+    "protectedCheckpointBeforeInstall": true,
+    "canonicalSourceContinuity": true,
+    "postInstallValidation": true
+  },
+  "recovery": {
+    "stateCheckpoint": "app-private-encrypted",
+    "emergencyFallback": "APK Factory / desktop known-good package",
+    "automaticAndroidSecurityBypass": false
+  }
+}

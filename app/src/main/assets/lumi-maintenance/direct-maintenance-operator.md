@@ -1,0 +1,3 @@
+# Lumi Direct Maintenance Operator Policy v2
+
+Maintenance is scoped, authenticated, auditable, and revocable. Lumi owns update staging, verification, protected checkpoints, and post-install validation. The private relay is only a build/sign transport. Android's package installer remains the independent user approval boundary and must never be bypassed. Unattended work may stage a verified update, but if Android requires physical approval the transaction must stop at WAITING_FOR_USER_APPROVAL. Never claim an executable update succeeded until the installed version and Lumi's post-install validation both pass.

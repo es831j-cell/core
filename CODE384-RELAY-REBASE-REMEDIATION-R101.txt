@@ -1,0 +1,22 @@
+LUMI CODE384 • RELAY REBASE REMEDIATION R101
+
+Purpose
+Repair the confirmed GitHub Trusted Build Relay HTTP 422 non-fast-forward failure found in the 2026-08-25 21:36 Black Box.
+
+Repairs
+- Keep force-push disabled.
+- If GitHub reports a genuine non-fast-forward race, re-read the authoritative remote lumi-release head.
+- Recreate the exact staged-source commit on that head and retry up to three times.
+- Fail closed for unrelated HTTP 422, authentication, policy, or repository errors.
+- Surface branch-resync counts in diagnostics.
+- Clarify Full Remediation counters as acceptance-window versus lifetime values; do not credit historical tests to the current acceptance window.
+
+Preserved healthy systems
+- Canonical source integrity
+- Guardian separation of duties and checkpoint/verify/install flow
+- Fast Brain and provider routing
+- Conversation/TTS-STT Full Remediation protections
+- Approved inverted-pyramid visual baseline
+
+Runtime proof still required
+The repair cannot be truthfully certified in this offline build workspace. The installed phone must complete a private GitHub Actions relay build, Guardian install/certification, the 20 clean spoken-reply window, owner voice acceptance, barge-in acceptance, maintenance-local routing, and live-web exercise.

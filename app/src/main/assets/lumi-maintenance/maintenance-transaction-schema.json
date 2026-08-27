@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 2,
+  "required": ["transactionId", "requestedChange", "state", "createdAt"],
+  "terminalStates": ["SUCCESS", "FAILED", "PARTIAL", "WAITING_FOR_USER_APPROVAL", "INSTALLED_VALIDATED"],
+  "successFields": [
+    "transactionId", "requestedChange", "resultingVersion", "installStatus",
+    "packageVerification", "postUpdateValidation", "rollbackCheckpoint", "completedAt"
+  ],
+  "failureStages": [
+    "relay", "authentication", "download", "build", "signature", "staging",
+    "checkpoint", "android_install", "permission_or_approval", "health_check", "rollback", "result_delivery"
+  ]
+}

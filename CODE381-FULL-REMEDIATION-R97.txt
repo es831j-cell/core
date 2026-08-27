@@ -1,0 +1,72 @@
+LUMI CODE381 • FULL BLACK BOX REMEDIATION R97
+
+BASE
+- Direct source successor to Code380 / 4.4.0-blackbox-complete-visual-r96.
+- Target: Code381 / 4.4.1-full-remediation-r97.
+- Preserves the approved R96 inverted-pyramid visual, Private visual baseline, Guardian v17 bridge, Contact Cards/Formal Introduction, Code379 Fast Brain output guardrails, Black Box completeness, and canonical source/update infrastructure.
+
+PURPOSE
+Code381 is the all-inclusive remediation release for the 2026-08-25 Code376 Black Box forensic diagnosis. The release rule is strict: every confirmed deficiency is either repaired in source and carried into acceptance testing, or explicitly recorded as an unresolved runtime/external dependency. Nothing from the diagnosis is silently deferred.
+
+CORE R97 REMEDIATION
+- Adds one authoritative conversation runtime state with generation tokens: IDLE, LISTENING, THINKING, SPEAKING, INTERRUPTED, STOPPED, RECOVERING.
+- Stale STT/TTS callbacks from an older generation cannot re-arm speech, mutate visual state, or promote a turn.
+- Manual Listen now starts a clean conversation generation and explicitly arms speaker acquisition. The prior acquisition window existed but was never armed.
+- Manual Stop invalidates pending STT/TTS work and is session-scoped; a fresh app process no longer inherits a stale Stop Listening latch.
+- Speaking state is entered only from the real TTS engine onStart callback. A submitted-but-not-started utterance cannot make Lumi appear to speak.
+- The post-TTS recognizer handoff has a single owner. STT no longer recursively reschedules itself while active TTS blocks the microphone.
+- READY-but-deaf detection now requires acoustic RMS evidence rather than treating ordinary silence as deafness.
+- Spoken stop/wait/pause/hold-on can silence Lumi immediately without granting owner/admin authority; protected follow-on actions still authenticate.
+- Direct-address continuity is longer and explicit Listen opens a bounded speaker-acquisition window while automatic hands-free listening does not silently adopt unknown speakers.
+- Insufficient speaker PCM is explicitly logged instead of being converted into a fictitious confidence result.
+- Self-audio is explicitly classified/rejected before turn promotion.
+- Maintenance phrases such as optimize yourself, run self diagnostics, update yourself, and build update route to the local maintenance path instead of ordinary external AI.
+- General AI instructions accurately describe Guardian, the maintenance host, Black Box, canonical source, rollback/checkpointing and trusted relay limits.
+
+ROUTING / PERFORMANCE
+- Fast Brain hedge threshold changed from 450 ms to 1400 ms to reduce needless duplicate local/cloud work.
+- Cloud provider timeouts are bounded more aggressively; 5xx, timeout, empty-response and truncated-response failures place providers into cooldown.
+- Truncated cloud responses signaled by finish_reason=length are rejected before TTS and the ladder continues.
+- Network telemetry uses the same canonical networkLabel path across diagnostics and routing-facing snapshots.
+- Fast Brain diagnostics now distinguish resource/model readiness from a successful real local inference.
+
+AUDIO / VEHICLE
+- On Android 12+, Lumi prefers an already-connected Bluetooth SCO/BLE communication device when the handset is still selected, without silently stealing an already-selected external route.
+- Audio route changes are flight-recorded for phone/vehicle diagnosis.
+
+VISUAL / RESOURCE CONTROL
+- Pyramid state is derived from authoritative conversation truth.
+- Speaking requires actual active TTS; Listening requires a live recognizer; Thinking requires an active request.
+- State disagreements are repaired, counted and recorded as STATE_DIVERGENCE faults.
+- The OpenGL surface no longer preserves EGL context while paused.
+- Renderer cadence is adaptive: approximately 30 FPS while idle and 60 FPS while active instead of continuously targeting ~120 FPS.
+
+BLACK BOX / DIAGNOSTIC REMEDIATION
+- READY_BUT_DEAF, recovery-circuit-open, conversation state divergence, and TTS watchdog timeouts are promoted to ERROR severity.
+- FullRemediationDiagnostics assembles event storms into causal incidents instead of returning a bag of counters.
+- Process exit history now includes process name and PID so LOW_MEMORY exits can be attributed.
+- Idle AUDIO_FOCUS wait windows are excluded from active-processing latency analysis.
+- Post-TTS handoff reports actual handoff latency rather than a cumulative age value.
+- Improvement Advisor carries Code381 acceptance as a top-priority item until it is complete and elevates any new state divergence.
+- Bootstrap certification cannot claim a full pass until the behavioral acceptance gate is satisfied and the trusted relay is configured.
+
+ACCEPTANCE CONTRACT
+Code381 is not considered fully remediated merely because it compiles or installs. Its on-phone acceptance gate requires:
+- 20 clean spoken replies.
+- Zero new TTS watchdog recoveries.
+- Zero recognizer recovery-circuit breaks.
+- Zero authoritative conversation-state divergences.
+- At least one successful spoken barge-in test.
+- At least one enrolled-owner voice acceptance.
+- At least one locally-routed maintenance intent.
+- Guardian/local maintenance host ready.
+- Zero LOW_MEMORY exits since Code381 installation.
+- Last measured AI response latency <= 5200 ms when a measurement exists.
+- Trusted private GitHub build relay configured.
+
+EXPLICIT NON-SOURCE DEPENDENCIES
+- Trusted GitHub build relay repository/credentials are not embedded or invented. Until configured, acceptance reports EXTERNAL CONFIG REQUIRED.
+- Android default-assistant ownership is an OS/user role decision. Code381 diagnoses it but does not silently take the role from another assistant.
+- Owner biometric proof depends on live microphone PCM being available to the speaker verifier. If Android SpeechRecognizer does not deliver sufficient PCM, Black Box now records SPEAKER_PCM_INSUFFICIENT and owner certification remains visibly pending.
+- LOW_MEMORY remediation is statically mitigated and future exits are process-attributed, but only installed-device runtime can prove the issue is gone.
+- Historical Black Box events that were never correlated cannot be retroactively given correlation IDs; current/future recording remains the authoritative evidence path.

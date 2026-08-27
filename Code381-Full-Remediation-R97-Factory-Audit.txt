@@ -1,0 +1,203 @@
+LUMI CODE381 • FULL BLACK BOX REMEDIATION R97 • BUILD AUDIT
+Prepared: 2026-08-25
+
+BASELINE
+- Source baseline: Code380 / 4.4.0-blackbox-complete-visual-r96.
+- Target: Code381 / 4.4.1-full-remediation-r97.
+- Scope contract: all 35 deficiencies identified in the Code376 Black Box forensic diagnosis must be repaired/tested or explicitly unresolved with evidence.
+
+35-FINDING REMEDIATION MATRIX
+Legend:
+  STATIC FIXED = source change implemented and statically verifiable in this package.
+  DEVICE VERIFY = repair exists but phone behavior must prove it under real Android audio/runtime conditions.
+  EXTERNAL CONFIG = cannot be honestly completed from source without user/OS/service configuration.
+  HISTORICAL LIMIT = old telemetry cannot be rewritten; future telemetry is corrected.
+
+01 • S1/D3 • Real speech rejected as media/background after direct-address lease expired
+STATUS: STATIC FIXED + DEVICE VERIFY
+- Manual Listen now arms a bounded speaker-acquisition window; active continuity uses a longer direct-address lease.
+- Automatic hands-free startup does not adopt an unknown speaker.
+
+02 • S1/D3 • Stop → Listen → old TTS race caused phantom Speaking and STT retry storm
+STATUS: STATIC FIXED + DEVICE VERIFY
+- Stop invalidates STT/TTS generations and pending work.
+- TTS Speaking begins only on the current utterance onStart callback.
+- STT blocked by active TTS returns without recursive rescheduling; TTS completion owns one handoff.
+
+03 • S1/D3 • Owner identity never established; accepted conversation remained 0% unverified
+STATUS: ROOT CAUSE STATIC FIXED + DEVICE VERIFY
+- Explicit speaker-acquisition state is now actually armed by Listen.
+- Insufficient live PCM is surfaced as SPEAKER_PCM_INSUFFICIENT rather than silently converted into owner identity.
+- Enrolled-owner acceptance remains a mandatory Code381 runtime acceptance condition.
+
+04 • S1/D3 • Owner could not reliably interrupt active TTS
+STATUS: STATIC FIXED + DEVICE VERIFY
+- Non-privileged STOP/WAIT/PAUSE/HOLD-ON silences TTS immediately.
+- The interruption itself grants no privileged authority; protected follow-on actions still require owner/admin verification.
+
+05 • S1/D3 • Recognizer READY-but-deaf
+STATUS: STATIC FIXED + DEVICE VERIFY
+- READY-but-deaf now requires observed acoustic RMS activity with no speech/transcript result.
+- Confirmed incidents are ERROR-severity and trigger bounded recognizer rebuild.
+
+06 • S1/D3 • Trusted self-update build relay not configured
+STATUS: EXTERNAL CONFIG REQUIRED
+- Guardian/bridge client code is preserved and acceptance explicitly tests relay configuration.
+- Repository and credentials are never fabricated or embedded. Until configured, full-remediation acceptance cannot report PASS.
+
+07 • S1/D3 • Maintenance commands routed to ordinary external AI
+STATUS: STATIC FIXED + DEVICE VERIFY
+- optimize yourself / self diagnostics / update yourself / build update route to the local maintenance command path.
+- maintenance_intent_local_routes is acceptance-tracked.
+
+08 • S1/D4 • Bootstrap/self-test could pass while Lumi remained functionally broken
+STATUS: STATIC FIXED
+- Code381 bootstrap certification is blocked until behavioral acceptance passes.
+- Full acceptance also requires relay configuration.
+
+09 • S1/D3 • LOW_MEMORY process exits
+STATUS: STATIC MITIGATION + DEVICE VERIFY
+- Pyramid background EGL preservation disabled and idle/active frame cadence reduced to ~30/~60 FPS.
+- Process-exit diagnostics now record process name/PID for attribution.
+- Acceptance requires zero LOW_MEMORY exits since Code381 install. Runtime proof remains mandatory.
+
+10 • S1/D4 • Trust-policy contradiction: 0% conversation accepted while owner commands blocked
+STATUS: STATIC FIXED + DEVICE VERIFY
+- Anonymous/foreground conversation continuity is separated from owner/admin authority.
+- Speaker acquisition cannot silently create owner privileges; protected actions still authenticate.
+
+11 • S2/D3 • Repeated recognizer code-7 recovery loops
+STATUS: STATIC FIXED + DEVICE VERIFY
+- Recursive TTS-blocked handoff scheduling removed; bounded restart circuit remains.
+- Circuit opening is now an ERROR and a zero-circuit-break acceptance condition.
+
+12 • S2/D3 • Repeated manual Listen required
+STATUS: STATIC FIXED + DEVICE VERIFY
+- Listen now creates a clean generation, resets speaker lock and explicitly starts acquisition rather than reusing stale conversation state.
+
+13 • S2/D3 • Stop Listening latch could survive fresh startup and leave Lumi deaf
+STATUS: STATIC FIXED
+- Stop button remains valid for the current process/session, but a fresh process clears the stale persisted latch and resumes normal hands-free policy.
+
+14 • S2/D3 • 21-second external AI response latency
+STATUS: STATIC FIXED POLICY + DEVICE VERIFY
+- Provider connect/read timeouts tightened and health cooldowns added.
+- Fast Brain hedge changed to 1400 ms.
+- Acceptance target is <=5200 ms for last measured response.
+
+15 • S2/D3 • Provider redundancy degraded but ladder appeared healthy
+STATUS: STATIC FIXED + LIVE PROVIDER DEPENDENCY
+- 5xx, timeout, empty and truncated responses trigger provider cooldown/demotion.
+- Provider health reports cooldown/failed state. Actual provider uptime remains external.
+
+16 • S2/D3 • 450 ms Fast Brain hedge wasted local/cloud work
+STATUS: STATIC FIXED
+- Hedge threshold raised to 1400 ms to give fast local inference a realistic chance before parallel cloud escalation.
+
+17 • S2/D2 • Fast Brain output-quality misses
+STATUS: PRESERVED FIX + DEVICE VERIFY
+- Code379 output guardrails remain intact.
+- Code381 distinguishes loaded/ready status from successful live normal inference; live proof remains observable.
+
+18 • S2/D3 • Lumi gave incorrect self-knowledge about maintenance/update capability
+STATUS: STATIC FIXED
+- Provider instructions accurately describe Guardian, maintenance host, Black Box, canonical source, rollback and relay limitations.
+- They explicitly prohibit claiming end-to-end self-build when relay is unconfigured.
+
+19 • S2/D2 • “Intelligence Update 001” contaminated unrelated conversational replies
+STATUS: STATIC CLEAN + DEVICE MONITOR
+- No literal Intelligence Update 001 / already-optimized response text exists in current Code381 source.
+- Maintenance capability context is now structured in system instructions and local maintenance routing.
+
+20 • S2/D2 • Truncated external response could be spoken
+STATUS: STATIC FIXED + DEVICE VERIFY
+- Cloud finish_reason=length is treated as a truncated-response fault; the ladder continues rather than handing the fragment to TTS.
+
+21 • S2/D3 • Pyramid visual state detached from runtime
+STATUS: STATIC FIXED + DEVICE VERIFY
+- Pyramid state is driven by ConversationRuntimeState; impossible combinations trigger STATE_DIVERGENCE and self-correction.
+
+22 • S2/D3 • Visual transitions could show Listening before actual listening / before TTS
+STATUS: STATIC FIXED + DEVICE VERIFY
+- Thinking, Speaking and Listening require corresponding runtime truth; TTS submission itself no longer sets Speaking.
+
+23 • S2/D2 • Self-echo still appeared in STT stream
+STATUS: STATIC FIXED PATH + DEVICE VERIFY
+- Self audio is explicitly classified and rejected before user-turn promotion; self-audio rejection is Black Box-visible.
+
+24 • S2/D2 • Significant TTS watchdog failure history
+STATUS: STATIC FIXED RACE CONTROL + DEVICE VERIFY
+- Watchdog remains as fail-safe, but stale TTS generations cannot resurrect state/listening.
+- Acceptance requires zero new watchdog recovery events over the validation run.
+
+25 • S2/D3 • Android default assistant was ChatGPT, not Lumi
+STATUS: EXTERNAL CONFIG REQUIRED
+- Code381 records the OS assistant component in forensic diagnostics.
+- It intentionally does not silently seize the Android assistant role. User/OS configuration is required if Lumi should own that role.
+
+26 • S2/D3 • Vehicle audio route remained handset while MyLink was available
+STATUS: STATIC FIXED POLICY + DEVICE VERIFY
+- On API31+, Lumi prefers a connected Bluetooth communication device when the built-in handset route is still selected.
+- It does not override an already-selected external device and logs the route decision.
+
+27 • S2/D3 • Network telemetry could disagree (Wi-Fi vs cellular)
+STATUS: STATIC FIXED
+- Device health and diagnostics use the canonical networkLabel implementation instead of duplicate network classification.
+
+28 • S2/D2 • “Fast Brain healthy” conflated model presence with recent successful inference
+STATUS: STATIC FIXED
+- Diagnostics report resource readiness separately from live-inference proof and last normal-inference age.
+
+29 • S3/D4 • Serious functional failures remained INFO/WARN while executive summary showed errors=0
+STATUS: STATIC FIXED
+- READY_BUT_DEAF, RECOVERY_CIRCUIT_OPEN, STATE_DIVERGENCE and TTS watchdog timeout conditions are promoted to ERROR.
+
+30 • S3/D4 • Improvement Advisor missed the largest active failures
+STATUS: STATIC FIXED
+- Code381 full-remediation acceptance is priority 99 until complete.
+- Any authoritative state divergence becomes a priority-100 source-level investigation item.
+
+31 • S3/D4 • Root Cause Summary repeated counters without causal assembly
+STATUS: STATIC FIXED
+- FullRemediationDiagnostics synthesizes major raw-event patterns into severity-ranked incident statements with evidence and remediation state.
+
+32 • S3/D3 • Historical event correlation only ~48%
+STATUS: HISTORICAL LIMIT
+- Old events that were recorded without correlation identifiers cannot honestly be retroactively correlated.
+- Current-session correlation from the modern recorder remains the authoritative path; Code381 explicitly preserves that limitation rather than claiming old data repaired.
+
+33 • S3/D2 • Warning storms obscured unique root causes
+STATUS: STATIC FIXED
+- Forensic synthesis collapses repeated tokens such as BLOCKED_DURING_TTS into one incident with count/evidence instead of presenting each retry as a new root cause.
+
+34 • S3/D2 • Latency profiler counted idle AUDIO_FOCUS/listening windows as active processing
+STATUS: STATIC FIXED
+- Idle AUDIO_FOCUS gaps are excluded from active-processing stage ranking.
+
+35 • S3/D2 • STT handoff metric accumulated age and looked like tens of seconds of handoff latency
+STATUS: STATIC FIXED + DEVICE VERIFY
+- Recognizer READY logs per-start ready latency and persistent post-TTS handoff records the actual one-shot handoff duration.
+
+SOURCE-LEVEL ACCEPTANCE / PRESERVATION
+- Guardian source tree must remain byte-identical to Code380.
+- Approved R96 pyramid geometry/colors/6-second transitions/private visual are preserved.
+- ConversationAudioGate/identity classes are retained; integration logic in MainActivity now correctly arms/uses their acquisition state.
+- No new plaintext secrets/API keys are added.
+- Canonical source build excludes transaction patch artifacts through Code381 to avoid self-reference.
+
+RUNTIME ACCEPTANCE GATE
+PENDING BY DESIGN until installed-device evidence exists:
+- 20 clean spoken replies.
+- 0 new TTS watchdog recoveries.
+- 0 recognizer recovery-circuit breaks.
+- 0 authoritative-state divergences.
+- >=1 successful spoken barge-in.
+- >=1 enrolled-owner voice acceptance.
+- >=1 locally-routed maintenance command.
+- Guardian/local maintenance host ready.
+- 0 LOW_MEMORY exits since Code381 install.
+- last measured response <=5200 ms.
+- trusted GitHub build relay configured.
+
+BUILD LIMIT
+This workspace does not contain the Android SDK/private signing chain. No signed APK is fabricated or claimed. The deliverable is APK-Factory-ready source plus transaction patch/checksums. Device-only and external-config conditions remain visibly pending in Lumi’s own acceptance report until proven.

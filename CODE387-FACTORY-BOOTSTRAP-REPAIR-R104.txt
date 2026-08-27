@@ -1,0 +1,22 @@
+LUMI CODE387 FACTORY BOOTSTRAP REPAIR R104
+
+Purpose
+- One-time APK Factory bootstrap to replace the broken Code383/Guardian installer path.
+- Future core updates return to Lumi -> Guardian -> Android approval when required -> install -> restart -> Guardian certification, with zero ChatGPT/chat interaction.
+
+Included
+- Lumi versionCode 387 / 4.4.7-factory-bootstrap-repair-r104.
+- Guardian versionCode 18 / 2.7-installer-recovery-r81.
+- Guardian checks install-source permission before opening Settings.
+- Pending PackageInstaller confirmation is retained and auto-presented when Guardian/Lumi is foreground.
+- Stale/missing PackageInstaller sessions are rebuilt from the retained, hash-verified, signature-verified APK.
+- Durable relay polling continues through install and post-install certification.
+- R103 stale durable-transaction reconciliation retained.
+- Approved inverted pyramid remains default with Listening forest green, Thinking crimson, Speaking violet, six-second transitions, and bounded X/Y idle motion.
+- Private Mode feature/UI/assets remain removed; purge migration retained for legacy state.
+- Clean spoken reply gate remains five consecutive replies; independent identity/barge-in/maintenance/latency gates remain separate.
+
+Bootstrap
+1. Build this ZIP in APK Factory and install Lumi Code387 once.
+2. Lumi detects Guardian v17 and presents the embedded Guardian v18 update on-device. Approve Android's Guardian replacement.
+3. No ChatGPT/chat step is required for subsequent bridge updates.

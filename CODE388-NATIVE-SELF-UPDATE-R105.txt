@@ -1,0 +1,45 @@
+LUMI CODE388 • NATIVE SELF-UPDATE + WORKSTATION HOME • R105
+Prepared: 2026-08-26
+
+PURPOSE
+One consolidated APK Factory bootstrap that removes the Guardian companion from Lumi's operational architecture and folds the current approved remediation/UI work into one in-place update.
+
+ARCHITECTURE
+- Guardian app/module/provider/permission/embed removed.
+- Lumi owns update verification, durable transaction state, protected local recovery checkpointing, APK identity/signature/version verification, installer handoff, and post-install validation.
+- Android remains the independent installation approval boundary. Lumi does not bypass Android's installer confirmation.
+- Private GitHub Actions build/sign relay remains available when a source update must be compiled and signed.
+- APK Factory remains bootstrap/recovery only after Code388 is installed.
+
+HOME / VISUAL
+- Home becomes a workstation surface with the live Lumi avatar centered.
+- Direct Home actions: Export Black Box, Update Center, Open Update ZIP.
+- Direct workstation actions: Chat, Voice, Diagnostics.
+- Approved layered Lumi geometry implemented: small upright top pyramid over the larger inverted lower pyramid, dark metallic ribs/crown, luminous inset glass.
+- State contract preserved: Listening deep forest green, Thinking crimson, Speaking violet; six-second transitions; calm bounded X/Y idle motion.
+
+SPEECH / RELIABILITY
+- Carries forward Code383 full-remediation speech watchdog, recognizer recovery, barge-in, authoritative state, owner-voice, self-audio gate, and Black Box acceptance instrumentation.
+- Native update/remediation diagnostics replace Guardian health/version gates.
+
+LATENCY / FAST BRAIN
+- Fast Brain hedge reduced from 1400 ms to 700 ms.
+- Fast Brain CPU thread budget capped at 3 to reduce excessive-resource process kills while retaining local-first response speed.
+- Existing real-inference proof, provider cooldown/demotion, routing telemetry, and latency Black Box remain active.
+
+INTERNET / AI ROUTING
+- Existing web/provider fallback and source-routing framework preserved.
+- Maintenance reasoning remains bounded by local authorization; cloud provider failure cannot replay a maintenance write.
+
+ANDROID ASSISTANT ROLE
+- Lumi reports the current Android assistant/voice-interaction setting in diagnostics.
+- Command Center includes an Android assistant settings shortcut.
+- Lumi never silently changes or steals the system assistant role.
+
+POST-INSTALL
+- MY_PACKAGE_REPLACED initializes Lumi's native self-update engine and runs post-install validation.
+- Black Box reports native self-update readiness, installer permission, validation result, trusted relay state, and durable transaction state.
+- Behavioral acceptance remains evidence-based; Code388 does not manufacture barge-in/owner/real-inference proof that has not occurred on the device.
+
+INSTALL
+Build this PRIVATE project ZIP in the existing private APK Factory path and install the resulting APK over the currently installed Lumi. Do not uninstall Lumi first.

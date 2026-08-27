@@ -1,0 +1,41 @@
+LUMI CODE382 • BRIDGE FORTIFICATION R98
+
+Target
+- versionCode 382
+- versionName 4.4.2-bridge-fortification-r98
+- required installed base: Code381 / 4.4.1-full-remediation-r97
+
+Purpose
+Code382 preserves the Code381 Full Remediation contract and fortifies the update bridge so APK Factory can become bootstrap/recovery-only after one-time bridge commissioning.
+
+Normal post-Code382 update road
+1. Owner selects a verified type=bridge-core Lumi update ZIP.
+2. Lumi validates package hashes, installed/base version, current canonical-source identity, target canonical source, change record, source safety and target version.
+3. Fresh administrator authentication is required before executable-core work starts.
+4. Trusted Build Relay preflight proves private repository access, real relay-branch write access, build workflow availability, signing-secret Actions load test, Guardian same-phone round trip and staging storage.
+5. Guardian accepts one exact maintenance transaction and creates a recovery checkpoint.
+6. Lumi stages the exact verified canonical source and persists transaction stage/hash/version identity.
+7. Lumi uploads source to the dedicated private relay branch with bounded retry and dispatch reconciliation.
+8. GitHub Actions restores private signing material from repository secrets, builds the exact target source and publishes one signed APK.
+9. Lumi downloads exactly one artifact, verifies package/version/signing/canonical-source identity, then submits it to Guardian.
+10. Guardian independently verifies, installs, handles any Android user-confirmation requirement, and performs post-install certification.
+11. The transaction is CERTIFIED only after the installed target and Guardian certification pass. Failures remain explicit and recoverable.
+
+Failure containment
+- 401/403 authentication failures fail closed.
+- transient socket/connect/timeout and selected HTTP failures receive bounded retry.
+- lost workflow-dispatch responses are reconciled against commit SHA before redispatch.
+- transaction state persists through app/process restart.
+- update source ZIPs reject signing keys, keystores, .git/.gradle/build output and unsafe paths.
+- secrets remain in Android-Keystore-backed storage or private CI secrets and are excluded from Black Box/export/model tool arguments.
+
+One-time commissioning
+Open Lumi → AI Interface / Integrations → Trusted Build Relay. The repository defaults to Lumi-APK-Factory-Build-2. Owner can be left blank and Lumi identifies it from the token. Save & load-test must PASS before the bridge is trusted.
+
+Important
+Code382 itself still needs the existing private APK Factory/signing path as the bootstrap install. After Code382 is installed and the Trusted Build Relay load-test passes, normal future core updates are designed to arrive as Lumi bridge-core ZIPs and bypass APK Factory.
+
+R98.1 compile repair (2026-08-25):
+- Fixed MainActivity.beginSelfOptimizationAnalysis() to declare bridgeStaged before use.
+- This addresses GitHub Actions javac failures at MainActivity.java lines 5609/5623: cannot find symbol bridgeStaged.
+- No runtime behavior, versionCode, signing identity, or bridge protocol changed by this compile repair.

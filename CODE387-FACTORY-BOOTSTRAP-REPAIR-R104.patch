@@ -1,0 +1,427 @@
+diff -ruN '--exclude=SOURCE-MANIFEST.txt' '--exclude=SOURCE-SHA256SUMS.txt' '--exclude=CODE387-FACTORY-BOOTSTRAP-REPAIR-R104.patch*' '--exclude=lumi-prototype-debug.jks' '--exclude=keystore.properties' /mnt/data/lumi_r103_build/target/CODE387-FACTORY-BOOTSTRAP-REPAIR-R104.txt source/CODE387-FACTORY-BOOTSTRAP-REPAIR-R104.txt
+--- /mnt/data/lumi_r103_build/target/CODE387-FACTORY-BOOTSTRAP-REPAIR-R104.txt	1970-01-01 00:00:00.000000000 +0000
++++ source/CODE387-FACTORY-BOOTSTRAP-REPAIR-R104.txt	2026-08-26 13:19:05.394369730 +0000
+@@ -0,0 +1,22 @@
++LUMI CODE387 FACTORY BOOTSTRAP REPAIR R104
++
++Purpose
++- One-time APK Factory bootstrap to replace the broken Code383/Guardian installer path.
++- Future core updates return to Lumi -> Guardian -> Android approval when required -> install -> restart -> Guardian certification, with zero ChatGPT/chat interaction.
++
++Included
++- Lumi versionCode 387 / 4.4.7-factory-bootstrap-repair-r104.
++- Guardian versionCode 18 / 2.7-installer-recovery-r81.
++- Guardian checks install-source permission before opening Settings.
++- Pending PackageInstaller confirmation is retained and auto-presented when Guardian/Lumi is foreground.
++- Stale/missing PackageInstaller sessions are rebuilt from the retained, hash-verified, signature-verified APK.
++- Durable relay polling continues through install and post-install certification.
++- R103 stale durable-transaction reconciliation retained.
++- Approved inverted pyramid remains default with Listening forest green, Thinking crimson, Speaking violet, six-second transitions, and bounded X/Y idle motion.
++- Private Mode feature/UI/assets remain removed; purge migration retained for legacy state.
++- Clean spoken reply gate remains five consecutive replies; independent identity/barge-in/maintenance/latency gates remain separate.
++
++Bootstrap
++1. Build this ZIP in APK Factory and install Lumi Code387 once.
++2. Lumi detects Guardian v17 and presents the embedded Guardian v18 update on-device. Approve Android's Guardian replacement.
++3. No ChatGPT/chat step is required for subsequent bridge updates.
+diff -ruN '--exclude=SOURCE-MANIFEST.txt' '--exclude=SOURCE-SHA256SUMS.txt' '--exclude=CODE387-FACTORY-BOOTSTRAP-REPAIR-R104.patch*' '--exclude=lumi-prototype-debug.jks' '--exclude=keystore.properties' /mnt/data/lumi_r103_build/target/app/build.gradle source/app/build.gradle
+--- /mnt/data/lumi_r103_build/target/app/build.gradle	2026-08-26 12:52:24.109566069 +0000
++++ source/app/build.gradle	2026-08-26 13:20:38.539267002 +0000
+@@ -38,8 +38,8 @@
+         applicationId 'com.distressedelk.lumi'
+         minSdk 28
+         targetSdk 35
+-        versionCode 386
+-        versionName '4.4.6-zero-chat-bridge-recovery-r103'
++        versionCode 387
++        versionName '4.4.7-factory-bootstrap-repair-r104'
+         ndk { abiFilters 'arm64-v8a' }
+     }
+ 
+@@ -174,7 +174,11 @@
+                 'CODE384-RELAY-REBASE-REMEDIATION-R101.patch',
+                 'CODE384-RELAY-REBASE-REMEDIATION-R101.patch.sha256',
+                 'CODE385-ZERO-CHAT-PYRAMID-R102.patch',
+-                'CODE385-ZERO-CHAT-PYRAMID-R102.patch.sha256'
++                'CODE385-ZERO-CHAT-PYRAMID-R102.patch.sha256',
++                'CODE386-ZERO-CHAT-BRIDGE-RECOVERY-R103.patch',
++                'CODE386-ZERO-CHAT-BRIDGE-RECOVERY-R103.patch.sha256',
++                'CODE387-FACTORY-BOOTSTRAP-REPAIR-R104.patch',
++                'CODE387-FACTORY-BOOTSTRAP-REPAIR-R104.patch.sha256'
+         ]
+         def secretNames = ['app/keystore.properties', 'app/lumi-prototype-debug.jks']
+         def files = []
+diff -ruN '--exclude=SOURCE-MANIFEST.txt' '--exclude=SOURCE-SHA256SUMS.txt' '--exclude=CODE387-FACTORY-BOOTSTRAP-REPAIR-R104.patch*' '--exclude=lumi-prototype-debug.jks' '--exclude=keystore.properties' /mnt/data/lumi_r103_build/target/app/src/main/java/com/distressedelk/lumi/GuardianBootstrap.java source/app/src/main/java/com/distressedelk/lumi/GuardianBootstrap.java
+--- /mnt/data/lumi_r103_build/target/app/src/main/java/com/distressedelk/lumi/GuardianBootstrap.java	1970-01-01 00:00:00.000000000 +0000
++++ source/app/src/main/java/com/distressedelk/lumi/GuardianBootstrap.java	2026-08-26 13:19:05.393448636 +0000
+@@ -24,7 +24,7 @@
+     static final String PACKAGE = "com.distressedelk.lumi.guardian";
+     private static final String TRUSTED_CERT = "0AD00784E2D593A469CB445D2CC1AFE94E31663768F96470A38144E84EFE8AD2";
+     private static final long PROMPT_COOLDOWN_MS = 60_000L;
+-    private static final long REQUIRED_GUARDIAN_VERSION = 17L;
++    private static final long REQUIRED_GUARDIAN_VERSION = 18L;
+ 
+     private GuardianBootstrap() {}
+ 
+@@ -68,8 +68,8 @@
+                 long now = System.currentTimeMillis();
+                 if (now - prefs.getLong("guardian_upgrade_last_prompt_at", 0L) >= PROMPT_COOLDOWN_MS) {
+                     prefs.edit().putLong("guardian_upgrade_last_prompt_at", now).apply();
+-                    new AlertDialog.Builder(activity).setTitle("Update Lumi Guardian")
+-                            .setMessage("Guardian is trusted but needs the Code364 bridge-permission repair. Install the embedded Guardian v17 update before running maintenance certification.")
++                    new AlertDialog.Builder(activity).setTitle("Finish bridge repair")
++                            .setMessage("The Factory bootstrap installed the repaired Lumi core. Android now needs one on-device approval to replace Guardian with v18, which fixes pending-install recovery and stale PackageInstaller sessions. ChatGPT is not part of this update path.")
+                             .setPositiveButton("Update Guardian", (d,w) -> installEmbeddedGuardian(activity, prefs))
+                             .setNegativeButton("Later", null).show();
+                 }
+diff -ruN '--exclude=SOURCE-MANIFEST.txt' '--exclude=SOURCE-SHA256SUMS.txt' '--exclude=CODE387-FACTORY-BOOTSTRAP-REPAIR-R104.patch*' '--exclude=lumi-prototype-debug.jks' '--exclude=keystore.properties' /mnt/data/lumi_r103_build/target/app/src/main/java/com/distressedelk/lumi/TrustedBuildRelayClient.java source/app/src/main/java/com/distressedelk/lumi/TrustedBuildRelayClient.java
+--- /mnt/data/lumi_r103_build/target/app/src/main/java/com/distressedelk/lumi/TrustedBuildRelayClient.java	1970-01-01 00:00:00.000000000 +0000
++++ source/app/src/main/java/com/distressedelk/lumi/TrustedBuildRelayClient.java	2026-08-26 13:19:05.394275110 +0000
+@@ -374,6 +374,9 @@
+     private static boolean pollGuardianCompletion(Context c,SharedPreferences p)throws Exception{
+         String id=p.getString("trusted_core_build_request_id",""); long target=p.getLong("trusted_core_build_target_version",-1L);
+         if(id.isEmpty()||target<=0L)throw new SecurityException("Trusted build Guardian completion state is incomplete");
++        Bundle resume=GuardianControlClient.call(c,"resume_pending_install");
++        if(!resume.getBoolean("ok",false) && !resume.getString("error","").isEmpty())
++            p.edit().putString("trusted_core_build_guardian_resume_error",resume.getString("error","")).apply();
+         Bundle g=GuardianControlClient.call(c,"maintenance_status");
+         if(!g.getBoolean("ok",false))throw new java.io.IOException("Guardian completion status unavailable: "+g.getString("error","unknown"));
+         if(g.getBoolean("core_recovery_required",false)){fail(p,id,"Guardian requires recovery: "+g.getString("core_recovery_reason","unknown"));return false;}
+diff -ruN '--exclude=SOURCE-MANIFEST.txt' '--exclude=SOURCE-SHA256SUMS.txt' '--exclude=CODE387-FACTORY-BOOTSTRAP-REPAIR-R104.patch*' '--exclude=lumi-prototype-debug.jks' '--exclude=keystore.properties' /mnt/data/lumi_r103_build/target/app/src/main/java/com/distressedelk/lumi/ZeroChatUpdateCoordinator.java source/app/src/main/java/com/distressedelk/lumi/ZeroChatUpdateCoordinator.java
+--- /mnt/data/lumi_r103_build/target/app/src/main/java/com/distressedelk/lumi/ZeroChatUpdateCoordinator.java	2026-08-26 12:56:03.301900282 +0000
++++ source/app/src/main/java/com/distressedelk/lumi/ZeroChatUpdateCoordinator.java	2026-08-26 13:19:05.394072580 +0000
+@@ -19,6 +19,8 @@
+         if(activity==null || p==null || !p.getBoolean("zero_chat_update_flow",true)) return;
+         if(p.getBoolean("trusted_core_build_active",false)) TrustedBuildRelayJobService.schedule(activity,1000L);
+         try{
++            Bundle recovery=GuardianControlClient.call(activity,"resume_pending_install");
++            if(recovery.getBoolean("ok",false)) p.edit().putString("zero_chat_guardian_resume_state",recovery.getString("state","")).apply();
+             Bundle approval=GuardianControlClient.call(activity,"pending_install_approval");
+             if(approval.getBoolean("ok",false) && approval.getBoolean("waiting",false) && approval.getBoolean("launcher_available",false)){
+                 int session=approval.getInt("session_id",-1);
+diff -ruN '--exclude=SOURCE-MANIFEST.txt' '--exclude=SOURCE-SHA256SUMS.txt' '--exclude=CODE387-FACTORY-BOOTSTRAP-REPAIR-R104.patch*' '--exclude=lumi-prototype-debug.jks' '--exclude=keystore.properties' /mnt/data/lumi_r103_build/target/guardian/build.gradle source/guardian/build.gradle
+--- /mnt/data/lumi_r103_build/target/guardian/build.gradle	1970-01-01 00:00:00.000000000 +0000
++++ source/guardian/build.gradle	2026-08-26 13:19:05.393338894 +0000
+@@ -22,8 +22,8 @@
+         applicationId 'com.distressedelk.lumi.guardian'
+         minSdk 28
+         targetSdk 35
+-        versionCode 17
+-        versionName '2.6-bridge-permission-r80'
++        versionCode 18
++        versionName '2.7-installer-recovery-r81'
+     }
+ 
+     signingConfigs {
+diff -ruN '--exclude=SOURCE-MANIFEST.txt' '--exclude=SOURCE-SHA256SUMS.txt' '--exclude=CODE387-FACTORY-BOOTSTRAP-REPAIR-R104.patch*' '--exclude=lumi-prototype-debug.jks' '--exclude=keystore.properties' /mnt/data/lumi_r103_build/target/guardian/src/main/AndroidManifest.xml source/guardian/src/main/AndroidManifest.xml
+--- /mnt/data/lumi_r103_build/target/guardian/src/main/AndroidManifest.xml	1970-01-01 00:00:00.000000000 +0000
++++ source/guardian/src/main/AndroidManifest.xml	2026-08-26 13:21:38.474916445 +0000
+@@ -33,6 +33,7 @@
+         <receiver android:name=".GuardianBootReceiver" android:exported="false">
+             <intent-filter>
+                 <action android:name="android.intent.action.BOOT_COMPLETED" />
++                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+             </intent-filter>
+         </receiver>
+         <provider
+diff -ruN '--exclude=SOURCE-MANIFEST.txt' '--exclude=SOURCE-SHA256SUMS.txt' '--exclude=CODE387-FACTORY-BOOTSTRAP-REPAIR-R104.patch*' '--exclude=lumi-prototype-debug.jks' '--exclude=keystore.properties' /mnt/data/lumi_r103_build/target/guardian/src/main/java/com/distressedelk/lumi/guardian/GuardianBootReceiver.java source/guardian/src/main/java/com/distressedelk/lumi/guardian/GuardianBootReceiver.java
+--- /mnt/data/lumi_r103_build/target/guardian/src/main/java/com/distressedelk/lumi/guardian/GuardianBootReceiver.java	1970-01-01 00:00:00.000000000 +0000
++++ source/guardian/src/main/java/com/distressedelk/lumi/guardian/GuardianBootReceiver.java	2026-08-26 13:21:38.474747235 +0000
+@@ -3,9 +3,19 @@
+ import android.content.BroadcastReceiver;
+ import android.content.Context;
+ import android.content.Intent;
++import android.os.Bundle;
+ 
+ public final class GuardianBootReceiver extends BroadcastReceiver {
+     @Override public void onReceive(Context context, Intent intent) {
+         GuardianLedger.append(context, "GUARDIAN_BOOT", "action=" + String.valueOf(intent.getAction()));
++        final PendingResult pending=goAsync();
++        new Thread(() -> {
++            try {
++                Bundle b=GuardianInstaller.resumeOrRecover(context.getApplicationContext());
++                GuardianLedger.append(context,b.getBoolean("ok",false)?"INSTALL_BOOT_RESUME":"INSTALL_BOOT_RESUME_FAIL",b.toString());
++            } catch(Throwable t) {
++                GuardianLedger.append(context,"INSTALL_BOOT_RESUME_ERROR",t.getClass().getSimpleName()+": "+String.valueOf(t.getMessage()));
++            } finally { pending.finish(); }
++        },"GuardianInstallResume").start();
+     }
+ }
+diff -ruN '--exclude=SOURCE-MANIFEST.txt' '--exclude=SOURCE-SHA256SUMS.txt' '--exclude=CODE387-FACTORY-BOOTSTRAP-REPAIR-R104.patch*' '--exclude=lumi-prototype-debug.jks' '--exclude=keystore.properties' /mnt/data/lumi_r103_build/target/guardian/src/main/java/com/distressedelk/lumi/guardian/GuardianControlProvider.java source/guardian/src/main/java/com/distressedelk/lumi/guardian/GuardianControlProvider.java
+--- /mnt/data/lumi_r103_build/target/guardian/src/main/java/com/distressedelk/lumi/guardian/GuardianControlProvider.java	1970-01-01 00:00:00.000000000 +0000
++++ source/guardian/src/main/java/com/distressedelk/lumi/guardian/GuardianControlProvider.java	2026-08-26 13:19:05.393967835 +0000
+@@ -168,6 +168,9 @@
+                 if(extras==null) throw new SecurityException("Missing relay build request");
+                 return TrustedBuildRelay.receiveAndInstall(getContext(),extras.getString("request_id",""),extras.getString("url",""),extras.getString("sha256",""),extras.getString("requested_change",""));
+             }
++            if("resume_pending_install".equals(method)) {
++                return GuardianInstaller.resumeOrRecover(getContext());
++            }
+             if("pending_install_approval".equals(method)) {
+                 android.content.SharedPreferences gp=getContext().getSharedPreferences("guardian",0);
+                 int sessionId=gp.getInt("last_install_session",-1);
+@@ -184,7 +187,7 @@
+             }
+             if("maintenance_status".equals(method)) {
+                 android.content.SharedPreferences gp=getContext().getSharedPreferences("guardian",0);
+-                out.putBoolean("ok", true); out.putInt("last_install_status", gp.getInt("last_install_status", Integer.MIN_VALUE)); out.putString("last_install_message", gp.getString("last_install_message", "")); out.putLong("last_install_target", gp.getLong("last_install_target", -1)); out.putBoolean("install_waiting_user_action",gp.getBoolean("install_waiting_user_action",false)); out.putBoolean("certification_pending", gp.getBoolean("certification_pending", false)); out.putString("last_bridge_request", gp.getString("last_bridge_request", "")); out.putString("last_bridge_sha256", gp.getString("last_bridge_sha256", "")); out.putLong("last_bridge_at", gp.getLong("last_bridge_at", 0)); out.putString("pending_request_state",gp.getString("pending_request_state","NONE")); out.putBoolean("last_certification_pass",gp.getBoolean("last_certification_pass",false)); out.putLong("last_certification_at",gp.getLong("last_certification_at",0L)); out.putInt("last_certification_attempts",gp.getInt("last_certification_attempts",0)); out.putString("last_certification_summary",gp.getString("last_certification_summary","")); out.putString("last_certification_probe",gp.getString("last_certification_probe","")); out.putBoolean("core_recovery_required",gp.getBoolean("core_recovery_required",false)); out.putString("core_recovery_reason",gp.getString("core_recovery_reason","")); out.putString("pending_request_id",gp.getString("pending_request_id","")); out.putString("pending_request_type",gp.getString("pending_request_type","")); out.putString("pending_request_change",gp.getString("pending_request_change","")); out.putLong("pending_request_at",gp.getLong("pending_request_at",0L)); return out;
++                out.putBoolean("ok", true); out.putInt("last_install_status", gp.getInt("last_install_status", Integer.MIN_VALUE)); out.putString("last_install_message", gp.getString("last_install_message", "")); out.putLong("last_install_target", gp.getLong("last_install_target", -1)); out.putBoolean("install_waiting_user_action",gp.getBoolean("install_waiting_user_action",false)); out.putBoolean("installer_permission_ready",android.os.Build.VERSION.SDK_INT<26 || getContext().getPackageManager().canRequestPackageInstalls()); out.putInt("last_install_session",gp.getInt("last_install_session",-1)); out.putBoolean("certification_pending", gp.getBoolean("certification_pending", false)); out.putString("last_bridge_request", gp.getString("last_bridge_request", "")); out.putString("last_bridge_sha256", gp.getString("last_bridge_sha256", "")); out.putLong("last_bridge_at", gp.getLong("last_bridge_at", 0)); out.putString("pending_request_state",gp.getString("pending_request_state","NONE")); out.putBoolean("last_certification_pass",gp.getBoolean("last_certification_pass",false)); out.putLong("last_certification_at",gp.getLong("last_certification_at",0L)); out.putInt("last_certification_attempts",gp.getInt("last_certification_attempts",0)); out.putString("last_certification_summary",gp.getString("last_certification_summary","")); out.putString("last_certification_probe",gp.getString("last_certification_probe","")); out.putBoolean("core_recovery_required",gp.getBoolean("core_recovery_required",false)); out.putString("core_recovery_reason",gp.getString("core_recovery_reason","")); out.putString("pending_request_id",gp.getString("pending_request_id","")); out.putString("pending_request_type",gp.getString("pending_request_type","")); out.putString("pending_request_change",gp.getString("pending_request_change","")); out.putLong("pending_request_at",gp.getLong("pending_request_at",0L)); return out;
+             }
+             out.putBoolean("ok",false);out.putString("error","Unsupported Guardian control method");return out;
+         }catch(Exception e){out.putBoolean("ok",false);out.putString("error",e.getClass().getSimpleName()+": "+String.valueOf(e.getMessage()));return out;}
+diff -ruN '--exclude=SOURCE-MANIFEST.txt' '--exclude=SOURCE-SHA256SUMS.txt' '--exclude=CODE387-FACTORY-BOOTSTRAP-REPAIR-R104.patch*' '--exclude=lumi-prototype-debug.jks' '--exclude=keystore.properties' /mnt/data/lumi_r103_build/target/guardian/src/main/java/com/distressedelk/lumi/guardian/GuardianInstaller.java source/guardian/src/main/java/com/distressedelk/lumi/guardian/GuardianInstaller.java
+--- /mnt/data/lumi_r103_build/target/guardian/src/main/java/com/distressedelk/lumi/guardian/GuardianInstaller.java	1970-01-01 00:00:00.000000000 +0000
++++ source/guardian/src/main/java/com/distressedelk/lumi/guardian/GuardianInstaller.java	2026-08-26 13:19:24.626768027 +0000
+@@ -3,33 +3,47 @@
+ import android.app.PendingIntent;
+ import android.content.Context;
+ import android.content.Intent;
++import android.content.SharedPreferences;
+ import android.content.pm.PackageInstaller;
+ import android.os.Build;
++import android.os.Bundle;
+ 
+ import java.io.File;
+ import java.io.FileInputStream;
+ import java.io.OutputStream;
++import java.security.MessageDigest;
++import java.util.Locale;
+ 
+ final class GuardianInstaller {
+     static final String ACTION_INSTALL_STATUS = "com.distressedelk.lumi.guardian.INSTALL_STATUS";
+     static final long MAX_APK_BYTES = 750L * 1024L * 1024L;
++    private static final String PREF = "guardian";
+ 
+     private GuardianInstaller() {}
+ 
+     static int installLumi(Context context, File apk, GuardianVerifier.VerifiedApk verified, boolean recovery) throws Exception {
++        if (apk == null || !apk.isFile()) throw new java.io.FileNotFoundException("Verified Lumi APK is missing.");
+         if (apk.length() > MAX_APK_BYTES) throw new SecurityException("APK exceeds Guardian's maximum allowed size.");
++        if (Build.VERSION.SDK_INT >= 26 && !context.getPackageManager().canRequestPackageInstalls())
++            throw new SecurityException("ANDROID_INSTALL_SOURCE_PERMISSION_REQUIRED");
++
++        retainCandidate(context, apk, verified, recovery);
+         PackageInstaller installer = context.getPackageManager().getPackageInstaller();
+         PackageInstaller.SessionParams params = new PackageInstaller.SessionParams(PackageInstaller.SessionParams.MODE_FULL_INSTALL);
+         params.setAppPackageName(TrustedIdentity.LUMI_PACKAGE);
+         params.setSize(apk.length());
++        // Ask Android for unattended replacement when policy permits. Sideload/update ownership rules
++        // may still require the system confirmation UI; R104 preserves and resumes that exact token.
+         if (Build.VERSION.SDK_INT >= 31) params.setRequireUserAction(PackageInstaller.SessionParams.USER_ACTION_NOT_REQUIRED);
+         if (Build.VERSION.SDK_INT >= 33) params.setPackageSource(PackageInstaller.PACKAGE_SOURCE_DOWNLOADED_FILE);
+ 
+         int sessionId = installer.createSession(params);
++        SharedPreferences prefs=context.getSharedPreferences(PREF, Context.MODE_PRIVATE);
++        prefs.edit().putInt("active_install_session",sessionId)
++                .putLong("active_install_target",verified.versionCode)
++                .putLong("active_install_created_at",System.currentTimeMillis())
++                .putBoolean("install_waiting_user_action",false).apply();
+         try (PackageInstaller.Session session = installer.openSession(sessionId)) {
+-            // R55: PackageInstaller requires every openWrite stream to be closed before commit().
+-            // Calling commit while the stream is still inside the same try-with-resources block
+-            // produces Android's SecurityException: "Files still open".
+             try (FileInputStream in = new FileInputStream(apk);
+                  OutputStream out = session.openWrite("lumi.apk", 0, apk.length())) {
+                 byte[] buf = new byte[1024 * 1024];
+@@ -44,21 +58,105 @@
+                 out.flush();
+                 session.fsync(out);
+             }
+-
+-            // All session file streams are closed now. It is safe to commit.
+             Intent status = new Intent(context, InstallStatusReceiver.class);
+             status.setAction(ACTION_INSTALL_STATUS);
+             status.putExtra("session_id", sessionId);
+             status.putExtra("target_version", verified.versionCode);
+             status.putExtra("target_name", verified.versionName);
+             status.putExtra("recovery", recovery);
+-            PendingIntent pending = PendingIntent.getBroadcast(
+-                    context,
+-                    sessionId,
+-                    status,
++            PendingIntent pending = PendingIntent.getBroadcast(context, sessionId, status,
+                     PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_MUTABLE);
+             session.commit(pending.getIntentSender());
++        } catch (Exception t) {
++            try { installer.abandonSession(sessionId); } catch (Throwable ignored) {}
++            prefs.edit().remove("active_install_session").remove("active_install_target").remove("active_install_created_at").apply();
++            throw t;
+         }
+         return sessionId;
+     }
++
++    static Bundle resumeOrRecover(Context context) {
++        Bundle out=new Bundle();
++        SharedPreferences p=context.getSharedPreferences(PREF,Context.MODE_PRIVATE);
++        try {
++            boolean permission=Build.VERSION.SDK_INT<26 || context.getPackageManager().canRequestPackageInstalls();
++            out.putBoolean("ok",true); out.putBoolean("installer_permission",permission);
++            if(!permission){ out.putString("state","ANDROID_INSTALL_SOURCE_PERMISSION_REQUIRED"); return out; }
++
++            int sessionId=p.getInt("last_install_session",p.getInt("active_install_session",-1));
++            boolean waiting=p.getBoolean("install_waiting_user_action",false)
++                    || p.getInt("last_install_status",Integer.MIN_VALUE)==PackageInstaller.STATUS_PENDING_USER_ACTION;
++            out.putInt("session_id",sessionId); out.putBoolean("waiting",waiting);
++
++            if(waiting){
++                PendingIntent pi=InstallApprovalStore.get(context,sessionId);
++                if(pi!=null){
++                    out.putBoolean("launcher_available",true); out.putParcelable("approval_intent",pi);
++                    out.putString("state","ANDROID_INSTALL_APPROVAL_REQUIRED"); return out;
++                }
++                // Confirmation PendingIntents do not survive every process/device transition. If
++                // Android no longer exposes the committed session, resubmit the retained verified APK.
++                PackageInstaller.SessionInfo info=sessionInfo(context,sessionId);
++                if(info==null){
++                    int fresh=resubmitRetained(context,sessionId);
++                    out.putInt("session_id",fresh); out.putBoolean("resubmitted",true);
++                    out.putString("state","INSTALL_RESUBMITTED"); return out;
++                }
++                out.putString("state","WAITING_FOR_ANDROID_CONFIRMATION_TOKEN"); return out;
++            }
++
++            PackageInstaller.SessionInfo info=sessionInfo(context,sessionId);
++            if(sessionId>=0 && info==null && hasRetainedCandidate(context)){
++                int fresh=resubmitRetained(context,sessionId);
++                out.putInt("session_id",fresh); out.putBoolean("resubmitted",true);
++                out.putString("state","INSTALL_RESUBMITTED"); return out;
++            }
++            out.putString("state","NO_PENDING_ANDROID_APPROVAL");
++            return out;
++        } catch(Throwable t){
++            out.putBoolean("ok",false); out.putString("state","INSTALL_RECOVERY_FAILED");
++            out.putString("error",t.getClass().getSimpleName()+": "+String.valueOf(t.getMessage())); return out;
++        }
++    }
++
++    static int resubmitRetained(Context context,int oldSession) throws Exception {
++        SharedPreferences p=context.getSharedPreferences(PREF,Context.MODE_PRIVATE);
++        File apk=retainedFile(p);
++        if(apk==null || !apk.isFile()) throw new java.io.FileNotFoundException("Retained verified Lumi APK is unavailable for install recovery.");
++        String expected=p.getString("retained_install_sha256","");
++        String actual=sha256(apk);
++        if(expected.length()!=64 || !expected.equals(actual)) throw new SecurityException("Retained Lumi APK hash changed; refusing resubmission.");
++        GuardianVerifier.VerifiedApk verified=GuardianVerifier.verifyLumiApk(context,apk,true);
++        long expectedTarget=p.getLong("retained_install_target",-1L);
++        if(expectedTarget>0 && verified.versionCode!=expectedTarget) throw new SecurityException("Retained Lumi APK version changed; refusing resubmission.");
++        if(oldSession>=0){ try{ context.getPackageManager().getPackageInstaller().abandonSession(oldSession); }catch(Throwable ignored){} InstallApprovalStore.clear(context,oldSession); }
++        p.edit().putBoolean("install_waiting_user_action",false).remove("last_install_status").remove("last_install_message").apply();
++        int fresh=installLumi(context,apk,verified,p.getBoolean("retained_install_recovery",false));
++        GuardianLedger.append(context,"INSTALL_SESSION_RESUBMITTED","old="+oldSession+" fresh="+fresh+" target="+verified.versionCode);
++        return fresh;
++    }
++
++    static void clearRetained(Context context) {
++        SharedPreferences p=context.getSharedPreferences(PREF,Context.MODE_PRIVATE);
++        File f=retainedFile(p);
++        if(f!=null && isInsideFilesDir(context,f)) try{ if(f.exists()) f.delete(); }catch(Throwable ignored){}
++        p.edit().remove("retained_install_apk_path").remove("retained_install_sha256")
++                .remove("retained_install_target").remove("retained_install_name").remove("retained_install_recovery")
++                .remove("active_install_session").remove("active_install_target").remove("active_install_created_at").apply();
++    }
++
++    private static void retainCandidate(Context context,File apk,GuardianVerifier.VerifiedApk verified,boolean recovery)throws Exception{
++        SharedPreferences p=context.getSharedPreferences(PREF,Context.MODE_PRIVATE);
++        p.edit().putString("retained_install_apk_path",apk.getCanonicalPath())
++                .putString("retained_install_sha256",sha256(apk))
++                .putLong("retained_install_target",verified.versionCode)
++                .putString("retained_install_name",verified.versionName==null?"":verified.versionName)
++                .putBoolean("retained_install_recovery",recovery).apply();
++    }
++
++    private static boolean hasRetainedCandidate(Context context){ File f=retainedFile(context.getSharedPreferences(PREF,Context.MODE_PRIVATE)); return f!=null&&f.isFile(); }
++    private static File retainedFile(SharedPreferences p){ String path=p.getString("retained_install_apk_path",""); return path.isEmpty()?null:new File(path); }
++    private static PackageInstaller.SessionInfo sessionInfo(Context c,int id){ if(id<0)return null; try{return c.getPackageManager().getPackageInstaller().getSessionInfo(id);}catch(Throwable t){return null;} }
++    private static boolean isInsideFilesDir(Context c,File f){ try{return f.getCanonicalPath().startsWith(c.getFilesDir().getCanonicalPath()+File.separator);}catch(Exception e){return false;} }
++    private static String sha256(File f)throws Exception{MessageDigest md=MessageDigest.getInstance("SHA-256");try(FileInputStream in=new FileInputStream(f)){byte[] b=new byte[1024*1024];int n;while((n=in.read(b))>0)md.update(b,0,n);}StringBuilder s=new StringBuilder();for(byte x:md.digest())s.append(String.format(Locale.US,"%02x",x));return s.toString();}
+ }
+diff -ruN '--exclude=SOURCE-MANIFEST.txt' '--exclude=SOURCE-SHA256SUMS.txt' '--exclude=CODE387-FACTORY-BOOTSTRAP-REPAIR-R104.patch*' '--exclude=lumi-prototype-debug.jks' '--exclude=keystore.properties' /mnt/data/lumi_r103_build/target/guardian/src/main/java/com/distressedelk/lumi/guardian/InstallStatusReceiver.java source/guardian/src/main/java/com/distressedelk/lumi/guardian/InstallStatusReceiver.java
+--- /mnt/data/lumi_r103_build/target/guardian/src/main/java/com/distressedelk/lumi/guardian/InstallStatusReceiver.java	1970-01-01 00:00:00.000000000 +0000
++++ source/guardian/src/main/java/com/distressedelk/lumi/guardian/InstallStatusReceiver.java	2026-08-26 13:19:05.393708932 +0000
+@@ -55,6 +55,7 @@
+ 
+         if (status == PackageInstaller.STATUS_SUCCESS) {
+             InstallApprovalStore.clear(context,sessionId);
++            GuardianInstaller.clearRetained(context);
+             prefs.edit().putBoolean("install_waiting_user_action",false).apply();
+             GuardianLedger.append(context, "INSTALL_SUCCESS", "session=" + sessionId + " target=" + target + " recovery=" + recovery);
+             prefs.edit().putBoolean("certification_pending", true).putLong("certification_target", target).putString("certification_reason","core_install").apply();
+@@ -85,7 +86,7 @@
+             GuardianLedger.append(context,"POST_INSTALL_UI","suppressed automatic Lumi activity launch");
+         } else {
+             InstallApprovalStore.clear(context,sessionId);
+-            prefs.edit().putBoolean("install_waiting_user_action",false).apply();
++            prefs.edit().putBoolean("install_waiting_user_action",false).remove("active_install_session").apply();
+             GuardianLedger.append(context, "INSTALL_FAILURE", "session=" + sessionId + " target=" + target + " status=" + status + " message=" + message);
+         }
+     }
+diff -ruN '--exclude=SOURCE-MANIFEST.txt' '--exclude=SOURCE-SHA256SUMS.txt' '--exclude=CODE387-FACTORY-BOOTSTRAP-REPAIR-R104.patch*' '--exclude=lumi-prototype-debug.jks' '--exclude=keystore.properties' /mnt/data/lumi_r103_build/target/guardian/src/main/java/com/distressedelk/lumi/guardian/MainActivity.java source/guardian/src/main/java/com/distressedelk/lumi/guardian/MainActivity.java
+--- /mnt/data/lumi_r103_build/target/guardian/src/main/java/com/distressedelk/lumi/guardian/MainActivity.java	1970-01-01 00:00:00.000000000 +0000
++++ source/guardian/src/main/java/com/distressedelk/lumi/guardian/MainActivity.java	2026-08-26 13:19:05.393863380 +0000
+@@ -51,10 +51,33 @@
+ 
+     @Override protected void onResume() {
+         super.onResume();
++        resumePendingInstall();
+         certifyIfPending();
+         refreshStatus();
+     }
+ 
++
++    private void resumePendingInstall() {
++        Bundle b=GuardianInstaller.resumeOrRecover(this);
++        if(!b.getBoolean("ok",false)) { GuardianLedger.append(this,"INSTALL_AUTO_RESUME_ERROR",b.toString()); return; }
++        if(!b.getBoolean("installer_permission",true)) return;
++        if(!b.getBoolean("waiting",false) || !b.getBoolean("launcher_available",false)) return;
++        int session=b.getInt("session_id",-1);
++        long now=System.currentTimeMillis();
++        if(session<0 || (prefs.getInt("last_foreground_approval_session",-1)==session && now-prefs.getLong("last_foreground_approval_at",0L)<5000L)) return;
++        android.app.PendingIntent pi;
++        if(android.os.Build.VERSION.SDK_INT>=33) pi=b.getParcelable("approval_intent",android.app.PendingIntent.class);
++        else pi=(android.app.PendingIntent)b.getParcelable("approval_intent");
++        if(pi==null) return;
++        try {
++            prefs.edit().putInt("last_foreground_approval_session",session).putLong("last_foreground_approval_at",now).apply();
++            pi.send();
++            GuardianLedger.append(this,"INSTALL_APPROVAL_AUTO_PRESENTED","session="+session);
++        } catch(android.app.PendingIntent.CanceledException e) {
++            GuardianLedger.append(this,"INSTALL_APPROVAL_AUTO_PRESENT_FAILED","session="+session+" canceled");
++        }
++    }
++
+     private void render() {
+         ScrollView scroll = new ScrollView(this);
+         LinearLayout root = new LinearLayout(this);
+@@ -93,7 +116,9 @@
+         String healthText = health.getString("summary", health.getString("error", "Lumi bridge unavailable"));
+         int installStatus = prefs.getInt("last_install_status", Integer.MIN_VALUE);
+         String installLine = installStatus == Integer.MIN_VALUE ? "No Guardian install transaction recorded yet." : "Last install status: " + installStatus + " • " + prefs.getString("last_install_message", "");
+-        status.setText("Guardian 2.4 • Trusted Build Gate\nLumi versionCode: " + version + "\nTrusted Lumi certificate: " + (trusted?"YES":"NO") + "\n\nLumi health: " + healthText + "\n\n" + installLine);
++        String guardianName="Guardian";
++        try { guardianName=getPackageManager().getPackageInfo(getPackageName(),0).versionName; } catch(Exception ignored) {}
++        status.setText("Guardian " + guardianName + " • Trusted Build Gate\nLumi versionCode: " + version + "\nTrusted Lumi certificate: " + (trusted?"YES":"NO") + "\n\nLumi health: " + healthText + "\n\n" + installLine);
+     }
+ 
+     private void createCheckpoint() {
+diff -ruN '--exclude=SOURCE-MANIFEST.txt' '--exclude=SOURCE-SHA256SUMS.txt' '--exclude=CODE387-FACTORY-BOOTSTRAP-REPAIR-R104.patch*' '--exclude=lumi-prototype-debug.jks' '--exclude=keystore.properties' /mnt/data/lumi_r103_build/target/zzzz-LUMI-BUILD-READY.txt source/zzzz-LUMI-BUILD-READY.txt
+--- /mnt/data/lumi_r103_build/target/zzzz-LUMI-BUILD-READY.txt	2026-08-26 12:52:24.125640405 +0000
++++ source/zzzz-LUMI-BUILD-READY.txt	2026-08-26 13:19:05.394405392 +0000
+@@ -1,12 +1,7 @@
+-LUMI CODE386 ZERO-CHAT BRIDGE RECOVERY R103 • SOURCE READY
+-Target: versionCode 386 • versionName 4.4.6-zero-chat-bridge-recovery-r103
+-Base for this bridge package: installed Code384 R101 canonical source.
++LUMI CODE387 FACTORY BOOTSTRAP REPAIR R104 • APK FACTORY READY
++Target: versionCode 387 • versionName 4.4.7-factory-bootstrap-repair-r104
++Embedded Guardian: versionCode 18 • versionName 2.7-installer-recovery-r81
+ 
+-Includes:
+-- R103 stale durable-transaction reconciliation and Guardian-confirmed rebind.
+-- R102 zero-chat relay continuation through Android approval/install/certification.
+-- Approved inverted-pyramid default with state colors and six-second transitions.
+-- Private Mode removal/purge retained.
+-- Five consecutive clean replies for the clean-reply acceptance window; independent safety/identity/barge-in/maintenance/latency gates remain.
+-
+-Important bootstrap note: if Code383 currently has the R101 transaction already live, finish that existing Guardian/Android install first. A bridge-core ZIP cannot execute R103 code before the currently installed app has successfully entered the relay transaction. After Code384 is installed/certified, import this R103 package; no ChatGPT/chat interaction is part of its update path.
++This is the one-time factory bootstrap repair for the broken Code383 install path.
++Future updates are zero-chat and resume on-device through Guardian.
++Approved inverted pyramid retained. Private Mode removed.

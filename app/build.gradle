@@ -1,12 +1,33 @@
-plugins {
-    id 'com.android.application'
-    id 'org.jetbrains.kotlin.android'
+buildscript {
+    repositories {
+        google()
+        mavenCentral()
+        gradlePluginPortal()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:8.7.2'
+        classpath 'org.jetbrains.kotlin:kotlin-gradle-plugin:2.0.21'
+    }
 }
+
+repositories {
+    google()
+    mavenCentral()
+}
+
+apply plugin: 'com.android.application'
+apply plugin: 'org.jetbrains.kotlin.android'
 
 def keystoreProperties = new Properties()
 def keystorePropertiesFile = file('keystore.properties')
 if (keystorePropertiesFile.exists()) {
     keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+}
+if (!keystorePropertiesFile.exists()) {
+    throw new GradleException("Missing private Lumi signing configuration: " + keystorePropertiesFile)
+}
+['storeFile','storePassword','keyAlias','keyPassword'].each { key ->
+    if (!keystoreProperties[key]) throw new GradleException("Missing Lumi signing property: " + key)
 }
 
 android {
@@ -17,8 +38,8 @@ android {
         applicationId 'com.distressedelk.lumi'
         minSdk 28
         targetSdk 35
-        versionCode 220
-        versionName '2.0'
+        versionCode 388
+        versionName '4.4.8-native-self-update-r105'
         ndk { abiFilters 'arm64-v8a' }
     }
 
@@ -45,25 +66,237 @@ android {
     }
     kotlinOptions { jvmTarget = '17' }
 
-    // llama-android ships arm64 native libraries. Keep JNI packaging deterministic
-    // in APK Factory/GitHub Actions and avoid legacy extraction differences.
-    packaging {
-        jniLibs {
-            useLegacyPackaging = false
-        }
-        resources {
-            excludes += ['/META-INF/{AL2.0,LGPL2.1}']
-        }
-    }
 }
 
 
 dependencies {
-    // Explicit versions mirror llama-android's published metadata. Keeping them
-    // explicit makes APK Factory dependency resolution reproducible.
-    implementation 'org.jetbrains.kotlin:kotlin-stdlib:2.0.21'
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.9.0'
     implementation 'androidx.core:core-ktx:1.13.1'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.9.0'
     implementation 'dev.ffmpegkit-maintained:llama-android:0.1.1'
 }
 
+
+// Code388 R105: Guardian companion removed. Lumi owns core staging and opens Android's normal installer directly.
+
+// Code325: every compiled Lumi core embeds a deterministic, non-secret snapshot of the
+// source tree used to build it. Core update transactions must carry this exact archive.
+def canonicalSourceDir = file('src/main/assets/lumi-source')
+def canonicalSourceZip = file('src/main/assets/lumi-source/canonical-source-baseline.zip')
+def canonicalSourceMeta = file('src/main/assets/lumi-source/canonical-source-metadata.json')
+
+tasks.register('generateCanonicalSourceBundle') {
+    outputs.files(canonicalSourceZip, canonicalSourceMeta)
+    outputs.upToDateWhen { false }
+    doLast {
+        canonicalSourceDir.mkdirs()
+        def root = rootProject.projectDir
+        def excluded = [
+                '.git/', '.gradle/', '.lumi/', 'build/', 'app/build/',
+                'app/src/main/assets/lumi-source/',
+                // Release patch is a transaction artifact carried beside canonical source.
+                // Excluding it avoids a self-referential source archive/patch cycle.
+                'CODE363-NEW-DAY-R79.patch',
+                'CODE364-VISUAL-VOICE-REPAIR-R80.patch',
+                'CODE365-INFO-GATHERING-R81.patch',
+                'CODE367-AVATAR-3D-R83.patch',
+                'CODE368-APPROVED-RENDER-R84.patch',
+                'CODE369-RELIABILITY-ROUTING-R85.patch',
+                'CODE370-CONVERSATION-3D-R86.patch',
+                'CODE371-BRIDGE-BUILD-R87.patch',
+                'CODE371-BRIDGE-BUILD-R87.patch.sha256',
+                'CODE372-BLACK-BOX-R88.patch',
+                'CODE372-BLACK-BOX-R88.patch.sha256',
+                'CODE373-BLACK-BOX-R89.patch',
+                'CODE373-BLACK-BOX-R89.patch.sha256',
+                'CODE374-BLACK-BOX-R90.patch',
+                'CODE374-BLACK-BOX-R90.patch.sha256',
+                'CODE375-BLACK-BOX-UPLOAD-R91.patch',
+                'CODE375-BLACK-BOX-UPLOAD-R91.patch.sha256',
+                'CODE376-IDENTITY-PYRAMID-R92.patch',
+                'CODE376-IDENTITY-PYRAMID-R92.patch.sha256',
+                'CODE377-SPEAKER-GATE-R93.patch',
+                'CODE377-SPEAKER-GATE-R93.patch.sha256',
+                'CODE378-VISUAL-RECOVERY-R94.patch',
+                'CODE378-VISUAL-RECOVERY-R94.patch.sha256',
+                'CODE379-VISUAL-FIDELITY-R95.patch',
+                'CODE379-VISUAL-FIDELITY-R95.patch.sha256',
+                'CODE380-BLACKBOX-COMPLETE-VISUAL-R96.patch',
+                'CODE380-BLACKBOX-COMPLETE-VISUAL-R96.patch.sha256',
+                'CODE381-FULL-REMEDIATION-R97.patch',
+                'CODE381-FULL-REMEDIATION-R97.patch.sha256',
+                'CODE382-BRIDGE-FORTIFICATION-R98.patch',
+                'CODE382-BRIDGE-FORTIFICATION-R98.patch.sha256',
+                'CODE383-BRIDGE-PROOF-R99.patch',
+                'CODE383-BRIDGE-PROOF-R99.patch.sha256',
+                'CODE383-BRIDGE-COMMISSIONING-R99.1.patch',
+                'CODE383-BRIDGE-COMMISSIONING-R99.1.patch.sha256',
+                'CODE384-TRUSTED-RELAY-CERTIFICATION-R100.patch',
+                'CODE384-TRUSTED-RELAY-CERTIFICATION-R100.patch.sha256',
+                'CODE384-RELAY-REBASE-REMEDIATION-R101.patch',
+                'CODE384-RELAY-REBASE-REMEDIATION-R101.patch.sha256',
+                'CODE385-ZERO-CHAT-PYRAMID-R102.patch',
+                'CODE385-ZERO-CHAT-PYRAMID-R102.patch.sha256',
+                'CODE386-ZERO-CHAT-BRIDGE-RECOVERY-R103.patch',
+                'CODE386-ZERO-CHAT-BRIDGE-RECOVERY-R103.patch.sha256',
+                'CODE387-FACTORY-BOOTSTRAP-REPAIR-R104.patch',
+                'CODE387-FACTORY-BOOTSTRAP-REPAIR-R104.patch.sha256'
+                ,'CODE388-NATIVE-SELF-UPDATE-R105.patch'
+                ,'CODE388-NATIVE-SELF-UPDATE-R105.patch.sha256'
+        ]
+        def secretNames = ['app/keystore.properties', 'app/lumi-prototype-debug.jks']
+        def files = []
+        root.eachFileRecurse { f ->
+            if (!f.isFile()) return
+            def rel = root.toPath().relativize(f.toPath()).toString().replace('\\','/')
+            if (excluded.any { rel == it.replaceAll('/$','') || rel.startsWith(it) }) return
+            if (secretNames.contains(rel)) return
+            if (rel.endsWith('.apk') || rel.endsWith('.aab') || rel.endsWith('.class') || rel.endsWith('.dex')) return
+            files << [file:f, rel:rel]
+        }
+        files.sort { a,b -> a.rel <=> b.rel }
+        def tmp = file(canonicalSourceZip.absolutePath + '.new')
+        if (tmp.exists()) tmp.delete()
+        def zos = new java.util.zip.ZipOutputStream(new BufferedOutputStream(new FileOutputStream(tmp)))
+        zos.setLevel(java.util.zip.Deflater.BEST_COMPRESSION)
+        try {
+            files.each { item ->
+                def e = new java.util.zip.ZipEntry(item.rel)
+                e.setTime(0L)
+                zos.putNextEntry(e)
+                item.file.withInputStream { input ->
+                    byte[] buffer = new byte[65536]
+                    int n
+                    while ((n = input.read(buffer)) > 0) zos.write(buffer, 0, n)
+                }
+                zos.closeEntry()
+            }
+        } finally { zos.close() }
+        if (canonicalSourceZip.exists() && !canonicalSourceZip.delete()) throw new GradleException('Could not replace canonical source asset')
+        if (!tmp.renameTo(canonicalSourceZip)) throw new GradleException('Could not publish canonical source asset')
+
+        def md = java.security.MessageDigest.getInstance('SHA-256')
+        canonicalSourceZip.withInputStream { input -> byte[] b=new byte[1024*1024]; int n; while((n=input.read(b))>0) md.update(b,0,n) }
+        def hash = md.digest().collect { String.format('%02x', it & 0xff) }.join('')
+        def meta = [
+                format: 'LumiCanonicalSource',
+                formatVersion: 1,
+                versionCode: android.defaultConfig.versionCode,
+                versionName: android.defaultConfig.versionName,
+                sourceArchiveSha256: hash,
+                fileCount: files.size(),
+                excludes: ['signing keys/keystore credentials','Gradle/build outputs','generated canonical-source assets']
+        ]
+        canonicalSourceMeta.text = groovy.json.JsonOutput.prettyPrint(groovy.json.JsonOutput.toJson(meta)) + '\n'
+        println "Generated canonical source: code ${android.defaultConfig.versionCode} files=${files.size()} sha256=${hash}"
+    }
+}
+
+afterEvaluate {
+    tasks.named('preDebugBuild').configure { dependsOn tasks.named('generateCanonicalSourceBundle') }
+    tasks.named('preReleaseBuild').configure { dependsOn tasks.named('generateCanonicalSourceBundle') }
+}
+
+// Legacy Code371 INAPP generator retained only for historical reproducibility.
+// Historical INAPP generator retained for reproducibility; Code388 uses Lumi native self-update.
+def lumiReleaseBaseSourceSha = 'ffdc400caa19a6f3b76236c2ae78604b25106c9a5d588f5abedb44cf5cb23644'
+def lumiReleasePatch = file('../CODE371-BRIDGE-BUILD-R87.patch')
+def sha256LumiRelease = { File file ->
+    def md = java.security.MessageDigest.getInstance('SHA-256')
+    file.withInputStream { input -> byte[] b=new byte[1024*1024]; int n; while((n=input.read(b))>0) md.update(b,0,n) }
+    md.digest().collect { String.format('%02x', it & 0xff) }.join('')
+}
+def writeLumiReleaseFile = { java.util.zip.ZipOutputStream zos, String path, File source ->
+    def e = new java.util.zip.ZipEntry(path); e.setTime(0L); zos.putNextEntry(e)
+    source.withInputStream { input -> byte[] b=new byte[65536]; int n; while((n=input.read(b))>0) zos.write(b,0,n) }
+    zos.closeEntry()
+}
+def writeLumiReleaseText = { java.util.zip.ZipOutputStream zos, String path, String text ->
+    def e = new java.util.zip.ZipEntry(path); e.setTime(0L); zos.putNextEntry(e)
+    zos.write(text.getBytes('UTF-8')); zos.closeEntry()
+}
+
+def registerLumiInAppPackage = { String cap, String lower ->
+    def taskName = "createLumiInApp${cap}"
+    tasks.register(taskName) {
+        outputs.upToDateWhen { false }
+        doLast {
+            def apkDir = file("build/outputs/apk/${lower}")
+            def candidates = fileTree(apkDir).matching { include '*.apk' }.files.findAll { it.isFile() }
+            if (candidates.size() != 1) throw new GradleException("Expected exactly one Lumi ${lower} APK for Code371 INAPP package, found ${candidates.size()}")
+            def apk = candidates.iterator().next()
+            if (!canonicalSourceZip.isFile()) throw new GradleException('Canonical source bundle is missing after Lumi build')
+            if (!lumiReleasePatch.isFile() || lumiReleasePatch.length() <= 0L) throw new GradleException('Release source patch is missing: CODE371-BRIDGE-BUILD-R87.patch')
+
+            def outDir = file('build/outputs/lumi-inapp'); outDir.mkdirs()
+            def changeFile = new File(outDir, "source-change-record-${lower}.json")
+            def targetSha = sha256LumiRelease(canonicalSourceZip)
+            def change = [
+                    format:'LumiSourceChangeRecord', formatVersion:1,
+                    updateId:'code371-bridge-build-r87',
+                    baseVersionCode:369, targetVersionCode:371,
+                    baseSourceSha256:lumiReleaseBaseSourceSha, targetSourceSha256:targetSha,
+                    reason:"Code371 combines the Code370 conversation/live-3D repair with the final trusted-build bootstrap. Owner-approved core edits are staged from canonical source, pushed to a private GitHub Actions relay, signed only with CI secrets, downloaded by immutable build commit, locally signature/version verified, then handed to Guardian for checkpoint/install. Factory becomes recovery-only.",
+                    filesChanged:[
+                            'app/src/main/java/com/distressedelk/lumi/MainActivity.java',
+                            'app/src/main/java/com/distressedelk/lumi/CloudBrainRouter.java',
+                            'app/src/main/java/com/distressedelk/lumi/PrivateAvatarView.java',
+                            'app/src/main/java/com/distressedelk/lumi/RuntimePolicy.java',
+                            'app/src/main/java/com/distressedelk/lumi/SourcePatchManager.java',
+                            'app/src/main/java/com/distressedelk/lumi/TrustedBuildRelayClient.java',
+                            'app/src/main/java/com/distressedelk/lumi/TrustedBuildRelayJobService.java',
+                            'app/src/main/java/com/distressedelk/lumi/LumiMaintenanceTools.java',
+                            'app/src/main/java/com/distressedelk/lumi/MaintenanceAuthorization.java',
+                            'app/src/main/java/com/distressedelk/lumi/UpdateTransactionManager.java',
+                            'app/src/main/java/com/distressedelk/lumi/SecretStore.java',
+                            'app/src/main/java/com/distressedelk/lumi/LumiBootReceiver.java',
+                            'app/src/main/AndroidManifest.xml',
+                            'app/build.gradle',
+                            '.github/workflows/build-apk.yml',
+                            '.github/workflows/lumi-bridge-build.yml',
+                            'CODE371-BRIDGE-BUILD-R87.txt',
+                            'zzzz-LUMI-BUILD-READY.txt'
+                    ],
+                    releaseManagement:'OWNER_APPROVED_BRIDGE_BUILD'
+            ]
+            changeFile.text = groovy.json.JsonOutput.prettyPrint(groovy.json.JsonOutput.toJson(change)) + '\n'
+
+            def files = [
+                    [path:'payload/Lumi-Code371-Bridge-Build-R87.apk', sha256:sha256LumiRelease(apk)],
+                    [path:'payload/canonical-source.zip', sha256:targetSha],
+                    [path:'payload/source-change-record.json', sha256:sha256LumiRelease(changeFile)],
+                    [path:'payload/source.patch', sha256:sha256LumiRelease(lumiReleasePatch)]
+            ]
+            def manifest = [
+                    formatVersion:1, updateId:'code371-bridge-build-r87', name:"Lumi Bridge Build R87",
+                    version:'4.3.1-bridge-build-r87', type:'core',
+                    minAppVersionCode:369, maxAppVersionCode:369,
+                    releaseNotes:"Bridge Build R87 includes the Code370 conversation/live-3D repair and activates owner-approved trusted core builds through private GitHub Actions. Lumi stages bounded source edits, CI signs with private secrets, and Guardian remains the independent signature/version/checkpoint/install/certification gate. APK Factory is recovery-only after this bootstrap.",
+                    files:files, apk:[path:'payload/Lumi-Code371-Bridge-Build-R87.apk'],
+                    sourceRecord:[formatVersion:1, baseVersionCode:369, targetVersionCode:371,
+                                  baseSourceSha256:lumiReleaseBaseSourceSha, targetSourceSha256:targetSha,
+                                  sourceArchivePath:'payload/canonical-source.zip',
+                                  changeRecordPath:'payload/source-change-record.json',
+                                  patchPath:'payload/source.patch']
+            ]
+            def output = new File(outDir, 'Code371-Bridge-Build-R87-INAPP.zip')
+            if (output.exists()) output.delete()
+            def zos = new java.util.zip.ZipOutputStream(new BufferedOutputStream(new FileOutputStream(output)))
+            zos.setLevel(java.util.zip.Deflater.BEST_COMPRESSION)
+            try {
+                writeLumiReleaseText(zos, 'lumi-update.json', groovy.json.JsonOutput.prettyPrint(groovy.json.JsonOutput.toJson(manifest)) + '\n')
+                writeLumiReleaseFile(zos, 'payload/Lumi-Code371-Bridge-Build-R87.apk', apk)
+                writeLumiReleaseFile(zos, 'payload/canonical-source.zip', canonicalSourceZip)
+                writeLumiReleaseFile(zos, 'payload/source-change-record.json', changeFile)
+                writeLumiReleaseFile(zos, 'payload/source.patch', lumiReleasePatch)
+            } finally { zos.close() }
+            println "Created Lumi in-app core update: ${output} (${output.length()} bytes)"
+        }
+    }
+    afterEvaluate { tasks.named("assemble${cap}").configure { finalizedBy tasks.named(taskName) } }
+}
+if (android.defaultConfig.versionCode == 371 && lumiReleasePatch.isFile() && !project.hasProperty('lumiBridgeRelay')) {
+    registerLumiInAppPackage('Debug','debug')
+    registerLumiInAppPackage('Release','release')
+} else {
+    println 'Lumi Code382+: legacy Code371 INAPP bootstrap packaging disabled; normal future core updates use verified bridge-core source ZIPs.'
+}

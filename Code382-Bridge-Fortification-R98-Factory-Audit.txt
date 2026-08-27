@@ -1,0 +1,73 @@
+LUMI CODE382 • BRIDGE FORTIFICATION R98 • FACTORY / BRIDGE AUDIT
+
+BASELINE
+PASS • Built as a focused delta over the verified Code381 Full Remediation R97 slim Factory baseline.
+PASS • Code381 full-remediation runtime/source remains present except for deliberate bridge/certification changes.
+PASS • Target versionCode=382 and versionName=4.4.2-bridge-fortification-r98.
+
+BRIDGE ROAD
+PASS • bridge-core ZIP intake added to LumiUpdateManager.
+PASS • Complete source envelope validation: base/target version, current canonical-source hash, target canonical-source hash, change record, declared payload hashes, target build.gradle identity and source archive safety.
+PASS • Fresh administrator session required before a verified bridge-core package can enter executable maintenance.
+PASS • One exact durable update transaction ID binds owner approval, Guardian request, target version and relay build.
+PASS • Guardian checkpoint occurs before source crosses the build bridge.
+PASS • SourcePatchManager stages an exact verified canonical source archive for the transaction.
+PASS • Trusted relay uses a dedicated private repository branch and immutable commit SHA.
+PASS • Git blob/tree/commit operations receive bounded transient retry.
+PASS • Workflow dispatch is reconciliation-safe after an ambiguous/lost HTTP response.
+PASS • 401/403 authentication failures are not retried as harmless transport errors.
+PASS • Relay polling is by immutable head commit SHA.
+PASS • Exactly one named build artifact and exactly one APK are accepted.
+PASS • Returned APK still passes Lumi package/signature/version/canonical-source verification before Guardian handoff.
+PASS • Guardian independently verifies/installs and preserves Android user-action requirements.
+PASS • Post-install state remains pending until Guardian certification PASS; no premature success claim.
+PASS • JobScheduler driver is persisted and transaction stages survive process restart.
+
+COMMISSIONING / LOAD TEST
+PASS • Configure UI defaults repository name to Lumi-APK-Factory-Build-2 and can derive GitHub owner from the authenticated token.
+PASS • Token is stored only through SecretStore (Android-Keystore-backed), never embedded into release metadata.
+PASS • Preflight proves private repository, push permission/actual relay-branch write, active build workflow, active preflight workflow, Guardian round trip and minimum local staging space.
+PASS • New lumi-bridge-preflight.yml performs a harmless real Actions dispatch and loads/tests the private signing identity with keytool+jarsigner without exporting signing material.
+PASS • Build workflow verifies transaction marker, target version/name and canonical-source identity, then builds signed release from CI-only signing secrets.
+
+FAILURE CONTAINMENT
+PASS • Source ZIP rejects unsafe traversal paths, signing keys/keystores, local.properties, .git, .gradle and build outputs.
+PASS • Bounded source/archive/artifact sizes and entry counts are enforced.
+PASS • Errors are redacted through SecretStore before diagnostics/UI persistence where applicable.
+PASS • APK Factory is described as bootstrap/recovery-only only after bridge commissioning passes.
+
+FULL REMEDIATION CONTINUITY
+PASS • Code381 35-finding forensic remediation contract remains the acceptance baseline.
+PASS • Code382 FullRemediationAcceptance refuses full completion while behavioral/runtime evidence or bridge commissioning is missing.
+PASS • Black Box/Improvement Advisor receive bridge commissioning and unresolved-dependency awareness instead of silently calling the system healthy.
+
+STATIC VALIDATION
+PASS • Code381→Code382 comparison contains 22 deliberate source/workflow/documentation deltas before generated release metadata.
+PASS • Java parser-level screen: zero parser/syntax-pattern errors; unresolved Android/org.json symbols are expected because this workspace does not contain the Android SDK classpath.
+PASS • GitHub Actions YAML parses successfully for both lumi-bridge-build.yml and lumi-bridge-preflight.yml.
+PASS • Android manifest already contains RECEIVE_BOOT_COMPLETED and the persisted TrustedBuildRelayJobService declaration.
+PASS • No plaintext GitHub PAT pattern or private CI signing secret value introduced by Code382 source.
+
+TRANSACTION PATCH
+SHA-256: f283456b913f0f1b45135e09cf398d167d88eddaa2970083863b13cc482335f1
+Bytes: 133379
+
+RUNTIME / EXTERNAL ACCEPTANCE NOT FAKED
+PENDING ON DEVICE • Install Code382 over Code381 and run the existing Full Remediation behavioral acceptance/Black Box gate.
+PENDING ONE-TIME EXTERNAL COMMISSIONING • A valid private GitHub token plus repository Actions signing secrets must exist; source code cannot invent these credentials.
+PENDING END-TO-END ROAD TEST • Save & load-test must PASS, then the first real bridge-core update must complete VERIFIED → CHECKPOINTED → RELAY → APK VERIFIED → GUARDIAN INSTALL → CERTIFIED before APK Factory is considered retired from the normal road.
+
+RESULT
+SOURCE/PACKAGE STATUS: READY FOR PRIVATE APK FACTORY BOOTSTRAP BUILD.
+OPERATIONAL BRIDGE STATUS: DESIGNED AND STATICALLY VALIDATED; must be commissioned and road-tested on the phone before it can truthfully be called production-certified.
+
+FINAL STATIC EVIDENCE
+PASS • Bridge/source/relay/Guardian invariants: 31/31.
+PASS • Patch replay: 30/30 patch-managed files byte-match the Code382 target.
+PASS • Source integrity before packaging: 158/158 entries verified.
+PASS • Plaintext token-pattern scan: 0 findings outside the intentionally preserved private bootstrap signing files.
+
+R98.1 FACTORY COMPILE REPAIR
+PASS • GitHub Actions reached :app:compileDebugJavaWithJavac, proving Factory upload/auth/project normalization succeeded.
+FIX  • MainActivity.beginSelfOptimizationAnalysis() now declares bridgeStaged via BridgeUpdatePackage.hasPending(this,prefs) before both branch and diagnostic use.
+SCOPE • One compile-scope defect repaired; no bridge protocol or behavior intentionally changed.

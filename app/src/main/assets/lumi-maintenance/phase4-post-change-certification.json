@@ -1,0 +1,18 @@
+{
+  "schema": "lumi.phase4.post-change-certification.v2",
+  "owner": "lumi-native-self-update",
+  "checks": [
+    "canonical_source_health",
+    "foundation_and_module_health",
+    "speech_and_microphone_availability",
+    "installed_version_matches_or_exceeds_target",
+    "real_fast_brain_proof_is_tracked_separately"
+  ],
+  "successState": "INSTALLED_VALIDATED",
+  "failureState": "POST_INSTALL_VALIDATION_FAILED",
+  "coreFailurePolicy": {
+    "preserveStateCheckpoint": true,
+    "automaticApkDowngrade": false,
+    "markRecoveryRequired": true
+  }
+}

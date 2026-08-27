@@ -1,0 +1,19 @@
+{
+  "schema": "lumi-maintenance-request-channel-v2",
+  "phase": 3,
+  "transport": "Lumi app-private durable transaction queue",
+  "allowedChangeTypes": [
+    "diagnose",
+    "runtime_tuning",
+    "content_update",
+    "core_update",
+    "rollback"
+  ],
+  "maxRequestChars": 500,
+  "freshnessWindowMs": 120000,
+  "replayProtection": "single-use nonce recorded in Lumi app-private transaction state",
+  "integrity": "SHA-256 envelope hash plus verified owner authorization",
+  "executionBoundary": "queue only; no shell, arbitrary file access, permission escalation, or install by request submission",
+  "approval": "write tools require owner authorization before Lumi accepts a maintenance transaction",
+  "installerBoundary": "Android package installer confirmation remains independent and is never bypassed"
+}

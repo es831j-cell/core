@@ -1,0 +1,35 @@
+LUMI CODE383 • BRIDGE COMMISSIONING R99.1
+
+Purpose
+Repair the Code382 Trusted Build Relay commissioning failure observed against the existing private
+Lumi-APK-Factory-Build repository.
+
+Confirmed root cause
+Code382 attempted to GET lumi-bridge-preflight.yml before that workflow existed in the permanent
+APK Factory repository. The configured apk-factory-build.yml itself was valid. The second fixed
+preflight-workflow lookup produced the 404.
+
+Repair
+- Accepts/migrates the troubleshooting values main + apk-factory-build.yml into Lumi's isolated
+  lumi-release + lumi-bridge-build.yml relay configuration.
+- Provisions Lumi's build and preflight workflow files onto the repository default branch once.
+- Lists GitHub Actions workflows and captures numeric workflow IDs before dispatch/polling.
+- Uses numeric IDs for dispatch and run reconciliation.
+- Preserves APK Factory's existing apk-factory-build.yml.
+- Preserves the existing apkfactory-project.zip baseline and uses its private signing files only
+  inside the ephemeral GitHub Actions runner. The signing files are never downloaded into Lumi.
+- The relay source branch remains separate from main.
+- Preflight checks repository privacy, push permission, retained signed baseline, workflow
+  provisioning, Actions execution, Guardian same-phone round trip, and local staging space.
+- If GitHub blocks workflow provisioning, Lumi now reports the exact one-time Workflows read/write
+  permission requirement instead of a generic 404.
+- No token value is logged or exported.
+
+Bootstrap note
+Code382 cannot repair its own compiled bridge client. Build/install this Code383 source once with
+the current private APK Factory path. After Code383 is installed and Save & load-test passes, APK
+Factory can return to recovery-only use.
+
+Runtime gate
+Full Android compilation, GitHub API provisioning, Actions execution, phone install, and Guardian
+certification remain device/runtime gates.

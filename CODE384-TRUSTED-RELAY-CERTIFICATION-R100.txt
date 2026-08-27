@@ -1,0 +1,17 @@
+LUMI CODE384 • TRUSTED RELAY CERTIFICATION R100
+
+Purpose
+Perform the first forward Lumi core update through the commissioned Trusted Build Relay.
+
+Scope
+- No feature expansion.
+- Bump the Lumi core from Code383 to Code384.
+- Add an explicit R100 migration marker so the post-install Black Box can prove the forward core is active.
+- Preserve the Code383 bridge commissioning repair, Full Remediation controls, Guardian separation of duties, and canonical-source integrity.
+
+Required path
+Code383 source ZIP → verified bridge-core intake → private GitHub Actions build/sign → Guardian checkpoint/verify/install → post-install Guardian certification.
+APK Factory must not be used for this proof update.
+
+Acceptance
+The bridge proof is successful only when the installed phone reports Code384, the Trusted Build Relay transaction is GUARDIAN_CERTIFIED/CERTIFIED, canonical source is healthy for Code384, and the Black Box records the R100 migration. Behavioral Full Remediation tests remain independent and must still be completed rather than silently waived.

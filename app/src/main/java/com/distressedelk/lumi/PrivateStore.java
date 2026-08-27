@@ -20,26 +20,35 @@ final class PrivateStore {
     private PrivateStore() {}
 
     static void write(SharedPreferences prefs, String preferenceKey, String plaintext) {
+        prefs.edit().putString(preferenceKey, encrypt(plaintext)).apply();
+    }
+
+    static String read(SharedPreferences prefs, String preferenceKey) {
+        return decrypt(prefs.getString(preferenceKey, ""));
+    }
+
+    /** Package-private crypto primitive used by the Lumi 1.0 Memory Vault. */
+    static String encrypt(String plaintext) {
+        if (plaintext == null || plaintext.isEmpty()) return "";
         try {
             SecretKey key = getOrCreateKey();
             Cipher cipher = Cipher.getInstance(TRANSFORMATION);
             cipher.init(Cipher.ENCRYPT_MODE, key);
             byte[] ciphertext = cipher.doFinal(plaintext.getBytes(StandardCharsets.UTF_8));
-            String packed = Base64.encodeToString(cipher.getIV(), Base64.NO_WRAP)
-                    + "."
-                    + Base64.encodeToString(ciphertext, Base64.NO_WRAP);
-            prefs.edit().putString(preferenceKey, packed).apply();
+            return "v1." + Base64.encodeToString(cipher.getIV(), Base64.NO_WRAP)
+                    + "." + Base64.encodeToString(ciphertext, Base64.NO_WRAP);
         } catch (Exception e) {
             throw new IllegalStateException("Unable to encrypt Lumi private memory", e);
         }
     }
 
-    static String read(SharedPreferences prefs, String preferenceKey) {
-        String packed = prefs.getString(preferenceKey, "");
+    static String decrypt(String packed) {
         if (packed == null || packed.isEmpty()) return "";
+        // Backward compatibility with the older IV.CIPHERTEXT preference packing.
+        String raw = packed.startsWith("v1.") ? packed.substring(3) : packed;
         try {
-            String[] parts = packed.split("\\.", 2);
-            if (parts.length != 2) return "";
+            String[] parts = raw.split("\\.", 2);
+            if (parts.length != 2) return packed; // tolerate an old plaintext value during migration
             byte[] iv = Base64.decode(parts[0], Base64.NO_WRAP);
             byte[] ciphertext = Base64.decode(parts[1], Base64.NO_WRAP);
             SecretKey key = getOrCreateKey();

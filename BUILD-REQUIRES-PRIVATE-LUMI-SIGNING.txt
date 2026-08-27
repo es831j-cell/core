@@ -1,0 +1,10 @@
+LUMI CODE388 R105 • PRIVATE SIGNING CONTINUITY
+
+Build Lumi with the preserved trusted Lumi signing identity.
+Expected certificate SHA-256: 0ad00784e2d593a469cb445d2cc1afe94e31663768f96470a38144e84efe8ad2
+The Code388 APK must match the currently installed Lumi certificate or Android must reject the in-place update.
+Do not replace, regenerate, rotate, or enroll a new certificate for this bootstrap.
+This PRIVATE APK-Factory archive contains the preserved signing files solely so the current Factory build can maintain update continuity.
+Canonical-source generation excludes the keystore and keystore.properties.
+Guardian is removed from Code388 and is not built, installed, or required.
+Use only with APK Factory's PRIVATE GitHub repository setting enabled. Do not publish this archive or its repository.

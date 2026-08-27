@@ -1,0 +1,55 @@
+LUMI CODE388 • NATIVE SELF-UPDATE + WORKSTATION HOME • R105 • FACTORY AUDIT
+Prepared: 2026-08-26
+
+SCOPE
+- Single private APK-Factory-ready bootstrap based on the latest Code387 R104 Factory source.
+- Target application: com.distressedelk.lumi
+- Target version: Code388 / 4.4.8-native-self-update-r105
+
+GUARDIAN REMOVAL
+PASS • root settings include only :app.
+PASS • Guardian source module removed.
+PASS • embedded Guardian APK removed.
+PASS • Guardian ContentProvider / IPC authority removed.
+PASS • Guardian signature permission and package query removed from AndroidManifest.
+PASS • Guardian maintenance policy asset removed.
+PASS • native Lumi self-update contract added.
+
+NATIVE SELF-UPDATE
+PASS • LumiSelfUpdateEngine owns local update health, requests, checkpointing, validation and package-replaced completion.
+PASS • pending core APK is checked for package identity, forward version, hash and trusted Lumi signing identity before installer handoff.
+PASS • protected local recovery checkpoint is created before executable install.
+PASS • Android REQUEST_INSTALL_PACKAGES path is used; Android/user confirmation is not bypassed.
+PASS • post-install validation runs after MY_PACKAGE_REPLACED.
+PASS • private trusted GitHub Actions relay retained for build/sign work without a companion app.
+
+HOME / VISUAL
+PASS • Home workstation includes direct Export Black Box, Update Center and Open Update ZIP.
+PASS • Home includes Chat, Voice and Diagnostics workstation actions.
+PASS • renderer geometry changed to approved layered Lumi form: upright top pyramid + larger inverted lower pyramid.
+PASS • state colors/transitions and bounded X/Y idle motion preserved.
+PASS • approved visual reference assets remain packaged.
+
+PERFORMANCE / REMEDIATION
+PASS • Fast Brain hedge reduced to 700 ms.
+PASS • Fast Brain worker thread cap limited to 3 to reduce excessive-resource kills.
+PASS • Code383 full-remediation acceptance remains evidence-based and now uses native self-update readiness/validation instead of Guardian certification.
+PASS • speech/watchdog/barge-in/owner/self-audio/latency instrumentation carried forward.
+PASS • Android assistant settings shortcut added; Lumi does not silently assume the system role.
+
+STATIC VALIDATION
+PASS • Java lexical brace/string/comment scan.
+PASS • javac parse reached only missing Android/org.json dependency errors; no Java syntax diagnostics detected.
+PASS • Kotlin compiler parse reached only missing Android/llama dependency errors; no Kotlin syntax diagnostics detected.
+PASS • Android/XML parse.
+PASS • JSON policy/asset parse.
+PASS • GitHub Actions YAML parse.
+PASS • private signing-continuity files retained for APK Factory.
+PASS • trusted Lumi signing certificate SHA-256: 0ad00784e2d593a469cb445d2cc1afe94e31663768f96470a38144e84efe8ad2
+PASS • runtime maintenance request channel now uses Lumi app-private durable transaction state, not a companion provider.
+PASS • current Lumi memory seed contains a Code388 authoritative override marking all later Guardian material as legacy history.
+PASS • Fast Brain cap is enforced at 3 threads in migration/runtime, health probes and worker loading; hedge is 700 ms.
+PASS • approved layered pyramid reference assets validate as PNG and are packaged in runtime assets/resources.
+
+ENVIRONMENT LIMITATION
+This environment does not contain the complete Android SDK/device install channel, so this audit does not claim that Code388 was compiled or installed here. The deliverable is the private APK-Factory-ready project ZIP. Build it in the existing private APK Factory path, install over the current Lumi without uninstalling, then export one fresh Black Box for device acceptance.

@@ -1,0 +1,18 @@
+{
+  "phase": 6,
+  "name": "trusted-build-package-relay",
+  "version": 2,
+  "artifact": {
+    "type": "signed-lumi-core-apk",
+    "sha256_required": true,
+    "lumi_package_signature_verification": true,
+    "forward_version_required": true
+  },
+  "transaction_binding": {
+    "lumi_durable_request_required": true,
+    "eligible_types": ["runtime_tuning", "content_update", "core_update"]
+  },
+  "authority": "lumi-native-self-update",
+  "androidInstallerApproval": "required",
+  "certification": "phase4-post-change-certification"
+}

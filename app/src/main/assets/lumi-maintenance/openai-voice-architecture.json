@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 2,
+  "feature": "openai-voice-maintenance",
+  "responsesApi": {
+    "enabledWhenCredentialConfigured": true,
+    "endpoint": "https://api.openai.com/v1/responses",
+    "localFunctionTools": true,
+    "credentialsInPrompt": false
+  },
+  "maintenance": {
+    "toolHost": "directMaintenanceHostV1",
+    "nativeSelfUpdateEngine": "lumi-native-self-update-r105",
+    "companionInstallerRequired": false,
+    "remoteShell": false,
+    "arbitraryFileAccess": false,
+    "signedRemoteUpdatePackagesOnly": true,
+    "androidInstallerBypass": false
+  }
+}
