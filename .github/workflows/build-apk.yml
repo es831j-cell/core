@@ -2,6 +2,9 @@ name: Lumi Code388 Signed Build
 run-name: Lumi Code388 R105 signed build
 
 on:
+  push:
+    branches:
+      - 'lumi-build/**'
   workflow_dispatch:
 
 permissions:
