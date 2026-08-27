@@ -69,7 +69,7 @@ d67466a03d1663dd515f5dd4293149d63d20d366dc2f54195f19eba2c04d2dff  ./app/src/main
 f3421fa88ce63c59b36744bf286bb0e822128a576efe78e0e3d2eccdee3b06b1  ./app/src/main/java/com/distressedelk/lumi/LumiTileService.java
 fbb274dcf8e45c3686e54007025b20994549cdc22fec70a08e77fef72cac6ca5  ./app/src/main/java/com/distressedelk/lumi/LumiUpdateManager.java
 eb463a52759ef954d43fba92e32039013f3c56d52376822ae62b49155298ce1d  ./app/src/main/java/com/distressedelk/lumi/LumiWidgetProvider.java
-b788d16df12d949bc48aff58c30daa430aafce9b1b7560768010ca1f66eef230  ./app/src/main/java/com/distressedelk/lumi/MainActivity.java
+7c1a59b20ea517b7ec4067194c020579391e4ad1531a1a31f614e66c462c9fa8  ./app/src/main/java/com/distressedelk/lumi/MainActivity.java
 af43f981f7e7c24d7cad6f675fe869ab0bcfd26a82ce073f80f3a2a395865cc8  ./app/src/main/java/com/distressedelk/lumi/MaintenanceAuthorization.java
 7e74538e23ebcd7c9a9edc1dce877d71a3c7c12044b57377557ca9b5ca7a2d0d  ./app/src/main/java/com/distressedelk/lumi/MaintenanceFoundation.java
 ea140f90f8a91a1f00b3781318d333c9bd00c6887749ff836aa3e894f06aa54b  ./app/src/main/java/com/distressedelk/lumi/MaintenanceSession.java

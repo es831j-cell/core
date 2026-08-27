@@ -4789,6 +4789,11 @@ public class MainActivity extends Activity {
     }
 
 
+    void showPersistentMemorySearch(){
+        memorySearch();
+    }
+
+
     void memorySearch(){
         final EditText e=new EditText(this);e.setHint("Search memory");
         new AlertDialog.Builder(this).setTitle("Search Lumi memory").setView(e)
