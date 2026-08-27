@@ -69,7 +69,7 @@ d67466a03d1663dd515f5dd4293149d63d20d366dc2f54195f19eba2c04d2dff  ./app/src/main
 f3421fa88ce63c59b36744bf286bb0e822128a576efe78e0e3d2eccdee3b06b1  ./app/src/main/java/com/distressedelk/lumi/LumiTileService.java
 fbb274dcf8e45c3686e54007025b20994549cdc22fec70a08e77fef72cac6ca5  ./app/src/main/java/com/distressedelk/lumi/LumiUpdateManager.java
 eb463a52759ef954d43fba92e32039013f3c56d52376822ae62b49155298ce1d  ./app/src/main/java/com/distressedelk/lumi/LumiWidgetProvider.java
-e4e7c905754775816d802cd3c0ff89c8d212e6bf75bc097bd9c45714c6b0a1e3  ./app/src/main/java/com/distressedelk/lumi/MainActivity.java
+b788d16df12d949bc48aff58c30daa430aafce9b1b7560768010ca1f66eef230  ./app/src/main/java/com/distressedelk/lumi/MainActivity.java
 af43f981f7e7c24d7cad6f675fe869ab0bcfd26a82ce073f80f3a2a395865cc8  ./app/src/main/java/com/distressedelk/lumi/MaintenanceAuthorization.java
 7e74538e23ebcd7c9a9edc1dce877d71a3c7c12044b57377557ca9b5ca7a2d0d  ./app/src/main/java/com/distressedelk/lumi/MaintenanceFoundation.java
 ea140f90f8a91a1f00b3781318d333c9bd00c6887749ff836aa3e894f06aa54b  ./app/src/main/java/com/distressedelk/lumi/MaintenanceSession.java
@@ -89,7 +89,7 @@ d014e4bfaa6ab31fb73c6b0da9e317185e4a3f17fb066bdbd1378c63d62b4818  ./app/src/main
 a369342e26b35ade5b692041091d41e91ebe767029736d135b9dc036fd7f4aa5  ./app/src/main/java/com/distressedelk/lumi/SourcePatchManager.java
 a404fb030fe0ffb1a93126494544a7a164ffb7ae80842cc0d5d83331a25b7ecb  ./app/src/main/java/com/distressedelk/lumi/SpeakerProfileRegistry.java
 ba5a0f79badc9e7c3b1c840c9b73d5662e1d9ec42f7033ac0d3026636ccbdee8  ./app/src/main/java/com/distressedelk/lumi/SpeakerVerifier.java
-c09c70f14accbed49987e6c16d48cd0413cdcc9c5918e24dc79eadc3d44e7ecc  ./app/src/main/java/com/distressedelk/lumi/TrustedBuildRelayClient.java
+434c65b85ba386565d01fda20165d0b3a1d90c9feb99f4476fd5b98f2cac68fd  ./app/src/main/java/com/distressedelk/lumi/TrustedBuildRelayClient.java
 9314f6f656b2ca3ca0bcdc66df2a960e6523e0a0c04d396b47626cf92419ce8b  ./app/src/main/java/com/distressedelk/lumi/TrustedBuildRelayJobService.java
 b6153e83d849215afa31df07167ae2be1b21e3c850ad463593e56c1d8ee28a0d  ./app/src/main/java/com/distressedelk/lumi/UpdateTransactionManager.java
 968762265604cfd6f358498ceb694cd3776b895c7b9acefebc3e12fe45f61aa1  ./app/src/main/java/com/distressedelk/lumi/WebResearchAgent.java

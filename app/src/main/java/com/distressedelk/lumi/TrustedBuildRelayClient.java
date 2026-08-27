@@ -133,9 +133,9 @@ final class TrustedBuildRelayClient {
     }
 
     /**
-     * Code382 commissioning/pre-build load test. This proves the saved credential can read the
-     * private repository, push source, read the fixed build workflow, dispatch Actions and prove
-     * Lumi's native self-update engine before an update transaction is allowed onto the relay.
+     * Commissioning/pre-build load test. This proves the saved credential can read the private
+     * repository, push source, read the fixed workflows, dispatch Actions and prove Lumi's native
+     * self-update engine before an update transaction is allowed onto the relay.
      */
     static JSONObject preflight(Context c,SharedPreferences p,boolean forceActionsProbe)throws Exception{
         Config cfg=config(p); long started=System.currentTimeMillis();
@@ -146,9 +146,6 @@ final class TrustedBuildRelayClient {
             if(permissions!=null && !permissions.optBoolean("push",false)) throw new SecurityException("GitHub token can read the relay repository but cannot push source");
             String defaultBranch=repo.optString("default_branch","main");
             if(cfg.branch.equals(defaultBranch)) throw new SecurityException("Relay branch must be separate from the repository default branch; use "+DEFAULT_BRANCH);
-
-            JSONObject baseline=getJson(cfg,"/repos/"+cfg.owner+"/"+cfg.repo+"/contents/apkfactory-project.zip?ref="+url(defaultBranch));
-            if(!"file".equalsIgnoreCase(baseline.optString("type","file"))) throw new SecurityException("Relay repository is missing apkfactory-project.zip signed baseline");
 
             ensureRelayWorkflows(cfg,defaultBranch);
             WorkflowRef buildWorkflow=resolveWorkflow(cfg,DEFAULT_WORKFLOW);
@@ -180,7 +177,7 @@ final class TrustedBuildRelayClient {
                 waitForPreflightRun(cfg,preflightWorkflow.id,defaultBranch,defaultHead,probeId);
                 p.edit().putBoolean("build_relay_last_actions_probe_ok",true).putLong("build_relay_last_actions_probe_at",System.currentTimeMillis()).apply();
             }
-            String detail="private repo + workflow auto-provision + numeric workflow IDs + isolated relay branch + signed-baseline Actions probe + Lumi native self-update + storage passed";
+            String detail="private repo + fixed workflows + numeric workflow IDs + isolated relay branch + protected-secret signing probe + Lumi native self-update + storage passed";
             p.edit().putBoolean("build_relay_last_preflight_ok",true).putLong("build_relay_last_preflight_at",System.currentTimeMillis())
                     .putString("build_relay_last_preflight_detail",detail).remove("build_relay_last_preflight_error").apply();
             return new JSONObject().put("ok",true).put("state","BRIDGE_PREFLIGHT_PASS").put("private",true)
@@ -195,11 +192,11 @@ final class TrustedBuildRelayClient {
             if(e instanceof HttpStatusException){
                 int code=((HttpStatusException)e).code;
                 if(code==403||code==404)
-                    detail="GitHub blocked one-time bridge workflow provisioning or access. Edit the fine-grained token and add Workflows: Read and write, then run Save & load-test again.";
+                    detail="GitHub blocked the relay repository, workflow, or Actions access. Confirm both Lumi workflows exist on the default branch and grant the token repository Contents and Actions read/write, then run Save & load-test again.";
             }
             p.edit().putBoolean("build_relay_last_preflight_ok",false).putLong("build_relay_last_preflight_at",System.currentTimeMillis())
                     .putString("build_relay_last_preflight_detail",detail).putString("build_relay_last_preflight_error",detail).apply();
-            if(detail.startsWith("GitHub blocked one-time")) throw new SecurityException(detail);
+            if(detail.startsWith("GitHub blocked the relay")) throw new SecurityException(detail);
             throw e;
         }
     }
@@ -432,32 +429,20 @@ final class TrustedBuildRelayClient {
             }
             if(attempt<7) Thread.sleep(1000L+attempt*350L);
         }
-        throw new java.io.FileNotFoundException("GitHub workflow not found after provisioning: "+filename);
+        throw new java.io.FileNotFoundException("GitHub workflow not found on the default branch: "+filename);
     }
 
     private static void ensureRelayWorkflows(Config cfg,String defaultBranch)throws Exception{
-        upsertWorkflow(cfg,defaultBranch,DEFAULT_WORKFLOW,BRIDGE_BUILD_YAML_B64);
-        upsertWorkflow(cfg,defaultBranch,PREFLIGHT_WORKFLOW,BRIDGE_PREFLIGHT_YAML_B64);
+        requireWorkflowFile(cfg,defaultBranch,DEFAULT_WORKFLOW);
+        requireWorkflowFile(cfg,defaultBranch,PREFLIGHT_WORKFLOW);
     }
 
-    private static void upsertWorkflow(Config cfg,String branch,String filename,String b64)throws Exception{
+    private static void requireWorkflowFile(Config cfg,String branch,String filename)throws Exception{
         String path=".github/workflows/"+filename;
         String endpoint="/repos/"+cfg.owner+"/"+cfg.repo+"/contents/"+url(path);
-        String desired=new String(Base64.decode(b64,Base64.DEFAULT),StandardCharsets.UTF_8);
-        String existingSha="";
-        try{
-            JSONObject cur=getJson(cfg,endpoint+"?ref="+url(branch));
-            existingSha=cur.optString("sha","");
-            String enc=cur.optString("content","").replace("\n","");
-            if(!enc.isEmpty()){
-                String current=new String(Base64.decode(enc,Base64.DEFAULT),StandardCharsets.UTF_8);
-                if(current.equals(desired)) return;
-            }
-        }catch(HttpStatusException e){ if(e.code!=404) throw e; }
-        JSONObject body=new JSONObject().put("message","Lumi bridge workflow provisioning: "+filename)
-                .put("content",Base64.encodeToString(desired.getBytes(StandardCharsets.UTF_8),Base64.NO_WRAP)).put("branch",branch);
-        if(!existingSha.isEmpty()) body.put("sha",existingSha);
-        putJson(cfg,endpoint,body,existingSha.isEmpty()?201:200);
+        JSONObject current=getJson(cfg,endpoint+"?ref="+url(branch));
+        if(!"file".equalsIgnoreCase(current.optString("type","")) || current.optString("sha","").isEmpty())
+            throw new java.io.FileNotFoundException("Required Lumi workflow is missing: "+path);
     }
 
     private static JSONObject putJson(Config cfg,String path,JSONObject body,int expected)throws Exception{
