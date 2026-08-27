@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
     inputs:
       request_id:
-        description: Owner-approved Guardian request id
+        description: Owner-approved Lumi request id
         required: true
         type: string
       target_version:
@@ -24,6 +24,10 @@ on:
 permissions:
   contents: read
 
+env:
+  EXPECTED_PACKAGE: com.distressedelk.lumi
+  EXPECTED_CERT_SHA256: 0ad00784e2d593a469cb445d2cc1afe94e31663768f96470a38144e84efe8ad2
+
 jobs:
   signed-build:
     runs-on: ubuntu-latest
@@ -32,69 +36,133 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Verify relay transaction marker
+          persist-credentials: false
+
+      - name: Verify relay transaction and source identity
         shell: bash
+        env:
+          INPUT_REQUEST_ID: ${{ inputs.request_id }}
+          INPUT_TARGET_VERSION: ${{ inputs.target_version }}
+          INPUT_TARGET_NAME: ${{ inputs.target_name }}
+          INPUT_TARGET_SOURCE_SHA256: ${{ inputs.target_source_sha256 }}
         run: |
           set -euo pipefail
           test -s .lumi/relay.json
-          python - <<'PY'
-          import json, re
-          d=json.load(open('.lumi/relay.json','r',encoding='utf-8'))
-          req='${{ inputs.request_id }}'
-          target='${{ inputs.target_version }}'
-          assert d.get('requestId') == req, 'relay request mismatch'
-          assert str(d.get('targetVersion')) == target, 'relay target mismatch'
-          assert d.get('targetSourceSha256') == '${{ inputs.target_source_sha256 }}', 'relay target source mismatch'
-          assert re.fullmatch(r'[0-9a-f]{64}', d.get('targetSourceSha256','')), 'malformed target source hash'
-          assert re.fullmatch(r'tx-[0-9]+-[A-Za-z0-9-]+', req), 'malformed request id'
-          print('relay marker verified')
+          python3 - <<'PY'
+          import json
+          import os
+          import re
+
+          request_id = os.environ['INPUT_REQUEST_ID']
+          target_version = os.environ['INPUT_TARGET_VERSION']
+          target_name = os.environ['INPUT_TARGET_NAME']
+          target_sha = os.environ['INPUT_TARGET_SOURCE_SHA256'].lower()
+          assert re.fullmatch(r'tx-[0-9]+-[A-Za-z0-9-]+', request_id), 'Malformed request id'
+          assert re.fullmatch(r'[0-9]+', target_version), 'Malformed target version'
+          assert target_name and len(target_name) <= 120, 'Malformed target name'
+          assert re.fullmatch(r'[0-9a-f]{64}', target_sha), 'Malformed target source hash'
+
+          with open('.lumi/relay.json', 'r', encoding='utf-8') as handle:
+              marker = json.load(handle)
+          assert marker.get('requestId') == request_id, 'Relay request mismatch'
+          assert str(marker.get('targetVersion')) == target_version, 'Relay target mismatch'
+          assert marker.get('targetSourceSha256', '').lower() == target_sha, 'Relay target source mismatch'
+
+          with open('app/build.gradle', 'r', encoding='utf-8') as handle:
+              gradle = handle.read()
+          assert re.search(r"applicationId\s+'com\.distressedelk\.lumi'", gradle), 'Package identity mismatch'
+          assert re.search(r'versionCode\s+' + re.escape(target_version) + r'(?:\s|$)', gradle), 'Source version code mismatch'
+          assert "versionName '" + target_name + "'" in gradle, 'Source version name mismatch'
+          print('Relay marker and requested source identity verified')
           PY
+
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '17'
+
       - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.9'
+
       - uses: android-actions/setup-android@v3
-      - name: Restore private Lumi signing identity from Factory baseline
+
+      - name: Restore private Lumi signing identity
         shell: bash
+        env:
+          LUMI_KEYSTORE_B64: ${{ secrets.LUMI_KEYSTORE_B64 }}
+          LUMI_STORE_PASSWORD: ${{ secrets.LUMI_STORE_PASSWORD }}
+          LUMI_KEY_ALIAS: ${{ secrets.LUMI_KEY_ALIAS }}
+          LUMI_KEY_PASSWORD: ${{ secrets.LUMI_KEY_PASSWORD }}
         run: |
           set -euo pipefail
-          git fetch origin main:refs/remotes/origin/main --depth=1
-          git show origin/main:apkfactory-project.zip > /tmp/apkfactory-project.zip
-          unzip -p /tmp/apkfactory-project.zip app/keystore.properties > app/keystore.properties
-          unzip -p /tmp/apkfactory-project.zip app/lumi-prototype-debug.jks > app/lumi-prototype-debug.jks
-          test -s app/keystore.properties
+          umask 077
+          test -n "${LUMI_KEYSTORE_B64:-}" || { echo "Missing LUMI_KEYSTORE_B64"; exit 2; }
+          test -n "${LUMI_STORE_PASSWORD:-}" || { echo "Missing LUMI_STORE_PASSWORD"; exit 2; }
+          test -n "${LUMI_KEY_ALIAS:-}" || { echo "Missing LUMI_KEY_ALIAS"; exit 2; }
+          test -n "${LUMI_KEY_PASSWORD:-}" || { echo "Missing LUMI_KEY_PASSWORD"; exit 2; }
+          printf '%s' "$LUMI_KEYSTORE_B64" | base64 --decode > app/lumi-prototype-debug.jks
           test -s app/lumi-prototype-debug.jks
-          chmod 600 app/keystore.properties app/lumi-prototype-debug.jks
-      - name: Verify requested version matches source
+          {
+            printf 'storeFile=%s\n' 'lumi-prototype-debug.jks'
+            printf 'storePassword=%s\n' "$LUMI_STORE_PASSWORD"
+            printf 'keyAlias=%s\n' "$LUMI_KEY_ALIAS"
+            printf 'keyPassword=%s\n' "$LUMI_KEY_PASSWORD"
+          } > app/keystore.properties
+          keytool -list -keystore app/lumi-prototype-debug.jks \
+            -storepass "$LUMI_STORE_PASSWORD" -alias "$LUMI_KEY_ALIAS" >/dev/null
+          cert_sha="$(keytool -list -v -keystore app/lumi-prototype-debug.jks \
+            -storepass "$LUMI_STORE_PASSWORD" -alias "$LUMI_KEY_ALIAS" \
+            | sed -n 's/.*SHA256: //p' | head -1 | tr -d ':[:space:]' | tr '[:upper:]' '[:lower:]')"
+          test "$cert_sha" = "$EXPECTED_CERT_SHA256" || { echo "Lumi signing certificate mismatch"; exit 3; }
+
+      - name: Build signed relay release
+        run: gradle :app:assembleRelease --no-daemon --stacktrace -PlumiBridgeRelay
+
+      - name: Verify relay APK provenance
         shell: bash
+        env:
+          INPUT_TARGET_VERSION: ${{ inputs.target_version }}
+          INPUT_TARGET_NAME: ${{ inputs.target_name }}
+          INPUT_TARGET_SOURCE_SHA256: ${{ inputs.target_source_sha256 }}
         run: |
           set -euo pipefail
-          grep -Eq "versionCode[[:space:]]+${{ inputs.target_version }}([[:space:]]|$)" app/build.gradle
-          grep -Fq "versionName '${{ inputs.target_name }}'" app/build.gradle
-      - name: Build signed release
-        run: gradle :app:assembleRelease --no-daemon --stacktrace
-      - name: Select exactly one APK and prove canonical source identity
-        shell: bash
-        run: |
-          set -euo pipefail
-          mapfile -t apks < <(find app/build/outputs/apk/release -maxdepth 1 -type f -name '*.apk' -print)
-          test "${#apks[@]}" -eq 1
+          mapfile -t apks < <(find app/build/outputs/apk/release -maxdepth 1 -type f -name '*.apk' -print | sort)
+          test "${#apks[@]}" -eq 1 || { echo "Expected exactly one release APK, found ${#apks[@]}"; exit 4; }
           cp "${apks[0]}" Lumi-Relay-Signed.apk
           test -s Lumi-Relay-Signed.apk
-          unzip -p Lumi-Relay-Signed.apk assets/lumi-source/canonical-source-metadata.json > /tmp/lumi-source-meta.json
-          python - <<'PY'
+
+          apksigner="$(find "$ANDROID_SDK_ROOT/build-tools" -type f -name apksigner -print | sort -V | tail -1)"
+          test -x "$apksigner" || { echo "apksigner was not found"; exit 5; }
+          "$apksigner" verify --verbose --print-certs Lumi-Relay-Signed.apk \
+            2>&1 | tee /tmp/lumi-apksigner.txt
+          cert_sha="$(sed -n 's/^Signer #1 certificate SHA-256 digest: //p' /tmp/lumi-apksigner.txt \
+            | head -1 | tr -d ':[:space:]' | tr '[:upper:]' '[:lower:]')"
+          test "$cert_sha" = "$EXPECTED_CERT_SHA256" || { echo "Signed APK certificate mismatch"; exit 6; }
+
+          unzip -p Lumi-Relay-Signed.apk \
+            assets/lumi-source/canonical-source-metadata.json > /tmp/lumi-source-meta.json
+          python3 - <<'PY'
           import json
-          d=json.load(open('/tmp/lumi-source-meta.json','r',encoding='utf-8'))
-          assert str(d.get('versionCode')) == '${{ inputs.target_version }}', 'APK canonical version mismatch'
-          assert d.get('sourceArchiveSha256') == '${{ inputs.target_source_sha256 }}', 'APK canonical source hash mismatch'
-          print('relay APK canonical source identity verified')
+          import os
+
+          with open('/tmp/lumi-source-meta.json', 'r', encoding='utf-8') as handle:
+              metadata = json.load(handle)
+          assert str(metadata.get('versionCode')) == os.environ['INPUT_TARGET_VERSION'], 'APK version code mismatch'
+          assert metadata.get('versionName') == os.environ['INPUT_TARGET_NAME'], 'APK version name mismatch'
+          assert metadata.get('sourceArchiveSha256', '').lower() == os.environ['INPUT_TARGET_SOURCE_SHA256'].lower(), 'APK canonical source hash mismatch'
+          assert int(metadata.get('fileCount', 0)) > 0, 'Embedded canonical source is empty'
+          print('Relay APK signature, version, and canonical source identity verified')
           PY
+
       - uses: actions/upload-artifact@v4
         with:
           name: lumi-relay-${{ inputs.request_id }}
           path: Lumi-Relay-Signed.apk
           if-no-files-found: error
           retention-days: 7
+
+      - name: Remove ephemeral signing material
+        if: always()
+        shell: bash
+        run: rm -f app/keystore.properties app/lumi-prototype-debug.jks

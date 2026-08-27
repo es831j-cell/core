@@ -1,4 +1,5 @@
-name: Lumi Code371 Bridge Build R87 Bootstrap
+name: Lumi Code388 Signed Build
+run-name: Lumi Code388 R105 signed build
 
 on:
   workflow_dispatch:
@@ -6,19 +7,46 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: lumi-code388-r105-signed-build
+  cancel-in-progress: false
+
+env:
+  EXPECTED_PACKAGE: com.distressedelk.lumi
+  EXPECTED_VERSION_CODE: '388'
+  EXPECTED_VERSION_NAME: 4.4.8-native-self-update-r105
+  EXPECTED_CERT_SHA256: 0ad00784e2d593a469cb445d2cc1afe94e31663768f96470a38144e84efe8ad2
+
 jobs:
-  build:
+  signed-build:
     runs-on: ubuntu-latest
     timeout-minutes: 35
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Verify Code388 canonical source
+        shell: bash
+        run: |
+          set -euo pipefail
+          sha256sum --quiet -c CANONICAL-SHA256SUMS.txt
+          grep -Eq "applicationId[[:space:]]+'$EXPECTED_PACKAGE'" app/build.gradle
+          grep -Eq "versionCode[[:space:]]+$EXPECTED_VERSION_CODE([[:space:]]|$)" app/build.gradle
+          grep -Fq "versionName '$EXPECTED_VERSION_NAME'" app/build.gradle
+
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '17'
+
       - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.9'
+
+      - uses: android-actions/setup-android@v3
+
       - name: Restore private Lumi signing identity
         shell: bash
         env:
@@ -28,28 +56,73 @@ jobs:
           LUMI_KEY_PASSWORD: ${{ secrets.LUMI_KEY_PASSWORD }}
         run: |
           set -euo pipefail
+          umask 077
           test -n "${LUMI_KEYSTORE_B64:-}" || { echo "Missing LUMI_KEYSTORE_B64"; exit 2; }
           test -n "${LUMI_STORE_PASSWORD:-}" || { echo "Missing LUMI_STORE_PASSWORD"; exit 2; }
           test -n "${LUMI_KEY_ALIAS:-}" || { echo "Missing LUMI_KEY_ALIAS"; exit 2; }
           test -n "${LUMI_KEY_PASSWORD:-}" || { echo "Missing LUMI_KEY_PASSWORD"; exit 2; }
           printf '%s' "$LUMI_KEYSTORE_B64" | base64 --decode > app/lumi-prototype-debug.jks
-          chmod 600 app/lumi-prototype-debug.jks
-          cat > app/keystore.properties <<PROPS
-          storeFile=lumi-prototype-debug.jks
-          storePassword=${LUMI_STORE_PASSWORD}
-          keyAlias=${LUMI_KEY_ALIAS}
-          keyPassword=${LUMI_KEY_PASSWORD}
-          PROPS
-          chmod 600 app/keystore.properties
-      - name: Build signed Lumi release and Code371 INAPP package
+          test -s app/lumi-prototype-debug.jks
+          {
+            printf 'storeFile=%s\n' 'lumi-prototype-debug.jks'
+            printf 'storePassword=%s\n' "$LUMI_STORE_PASSWORD"
+            printf 'keyAlias=%s\n' "$LUMI_KEY_ALIAS"
+            printf 'keyPassword=%s\n' "$LUMI_KEY_PASSWORD"
+          } > app/keystore.properties
+          keytool -list -keystore app/lumi-prototype-debug.jks \
+            -storepass "$LUMI_STORE_PASSWORD" -alias "$LUMI_KEY_ALIAS" >/dev/null
+          cert_sha="$(keytool -list -v -keystore app/lumi-prototype-debug.jks \
+            -storepass "$LUMI_STORE_PASSWORD" -alias "$LUMI_KEY_ALIAS" \
+            | sed -n 's/.*SHA256: //p' | head -1 | tr -d ':[:space:]' | tr '[:upper:]' '[:lower:]')"
+          test "$cert_sha" = "$EXPECTED_CERT_SHA256" || { echo "Lumi signing certificate mismatch"; exit 3; }
+
+      - name: Build signed Code388 release
         run: gradle :app:assembleRelease --no-daemon --stacktrace
-      - name: Verify Code371 INAPP output exists
-        run: test -s app/build/outputs/lumi-inapp/Code371-Bridge-Build-R87-INAPP.zip
+
+      - name: Verify signed Code388 APK
+        shell: bash
+        run: |
+          set -euo pipefail
+          mapfile -t apks < <(find app/build/outputs/apk/release -maxdepth 1 -type f -name '*.apk' -print | sort)
+          test "${#apks[@]}" -eq 1 || { echo "Expected exactly one release APK, found ${#apks[@]}"; exit 4; }
+          cp "${apks[0]}" Lumi-Code388-R105-Signed.apk
+          test -s Lumi-Code388-R105-Signed.apk
+
+          apksigner="$(find "$ANDROID_SDK_ROOT/build-tools" -type f -name apksigner -print | sort -V | tail -1)"
+          test -x "$apksigner" || { echo "apksigner was not found"; exit 5; }
+          "$apksigner" verify --verbose --print-certs Lumi-Code388-R105-Signed.apk \
+            2>&1 | tee /tmp/lumi-apksigner.txt
+          cert_sha="$(sed -n 's/^Signer #1 certificate SHA-256 digest: //p' /tmp/lumi-apksigner.txt \
+            | head -1 | tr -d ':[:space:]' | tr '[:upper:]' '[:lower:]')"
+          test "$cert_sha" = "$EXPECTED_CERT_SHA256" || { echo "Signed APK certificate mismatch"; exit 6; }
+
+          unzip -p Lumi-Code388-R105-Signed.apk \
+            assets/lumi-source/canonical-source-metadata.json > /tmp/lumi-source-meta.json
+          python3 - <<'PY'
+          import json
+          import os
+          import re
+
+          with open('/tmp/lumi-source-meta.json', 'r', encoding='utf-8') as handle:
+              metadata = json.load(handle)
+          assert str(metadata.get('versionCode')) == os.environ['EXPECTED_VERSION_CODE'], 'APK version code mismatch'
+          assert metadata.get('versionName') == os.environ['EXPECTED_VERSION_NAME'], 'APK version name mismatch'
+          assert re.fullmatch(r'[0-9a-f]{64}', metadata.get('sourceArchiveSha256', '')), 'Malformed embedded source hash'
+          assert int(metadata.get('fileCount', 0)) > 0, 'Embedded canonical source is empty'
+          print('Code388 APK identity and canonical-source metadata verified')
+          PY
+          sha256sum Lumi-Code388-R105-Signed.apk > Lumi-Code388-R105-SHA256.txt
+
       - uses: actions/upload-artifact@v4
         with:
-          name: lumi-code371-bridge-build-r87
+          name: lumi-code388-r105-signed
           path: |
-            app/build/outputs/lumi-inapp/Code371-Bridge-Build-R87-INAPP.zip
-            app/build/outputs/apk/release/*.apk
+            Lumi-Code388-R105-Signed.apk
+            Lumi-Code388-R105-SHA256.txt
           if-no-files-found: error
           retention-days: 14
+
+      - name: Remove ephemeral signing material
+        if: always()
+        shell: bash
+        run: rm -f app/keystore.properties app/lumi-prototype-debug.jks
