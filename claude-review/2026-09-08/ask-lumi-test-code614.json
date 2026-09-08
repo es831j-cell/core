@@ -1,0 +1,9 @@
+{
+  "ok": false,
+  "state": "ACTIVITY_UNAVAILABLE",
+  "format": "LumiRemoteMaintenanceResponse",
+  "id": "ask-lumi-test-614-1788903105000",
+  "action": "ASK_LUMI_TEST",
+  "versionCode": 614,
+  "completedAt": 1788903243363
+}
